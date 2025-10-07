@@ -1,0 +1,115 @@
+{
+    "login_header": "Welcome Back",
+    "login_subheader": "You`ve been missed",
+    "login_button_label": "Sign in",
+
+    "already_have_account": "Already have an account?",
+    "already_have_account_link": "Sign in",
+    "dont_have_acocunt": "Dont have an account?",
+    "dont_have_acocunt_link": "Create",
+
+    "signup_header": "Get Started",
+    "signup_subheader": "Enter your credentials to continue",
+    "signup_button_label": "Sign up",    
+
+    "navigator_label_home": "Home",
+    "navigator_label_promo": "Promo",
+    "navigator_label_shop": "Shop",
+    "navigator_label_activity": "Activity",
+    "navigator_label_account": "Account",
+
+    "home_welcome_word": "Hello",
+    "home_location_word": "Location",
+    "home_search_word": "Find you needed",
+    "home_produk_slider_title": "Best Deal",
+    "home_produk_slider_title_new_items": "New Items",
+    "home_produk_slder_more": "see all",
+
+    "category_fruits_vegetables": "Fruits and Vegetables",
+    "category_drink": "Drinks",
+    "category_food": "Foods",
+    "category_home_supplies": "Home Supplies",
+    "category_kitchen_supplies": "Kitchen Supplies",
+    "category_health_essentials": "Health Essentials",
+    "category_parcel": "Parcel Products",
+
+    "category_choose_title": "Choose Category",
+
+    "search_hint": "Search Produk",
+
+    "activity_title": "Activity",
+    "activity_tab_title_shopping_list": "Shopping list",
+    "activity_tab_title_history": "Purchasing history",
+    "activity_budget": "Budget",
+    "activity_clear_items": "Clear items",
+    "activity_add_to_cart": "Add to Cart",
+
+    "activity_clear_items_modal_title": "Clear Items",
+    "activity_clear_items_modal_subtitle": "Are you sure you want to delete all the items?",
+    "activity_clear_items_modal_confirm": "Confirm",
+    "activity_clear_items_modal_cancel": "Cancel",    
+    "activity_empty": "Your shopping list is empty",
+
+    "activity_to_cart_modal_title": "Empty the cart?",
+    "activity_to_cart_modal_subtitle": "All Items in the cart will be deleted",
+    "activity_to_cart_modal_confirm": "Don`t",
+    "activity_to_cart_modal_cancel": "Yes, Clear first",
+
+    "activity_budget_change_title": "Set Budget",
+    "activity_budget_change_hint": "Example: Rp 100.000",
+    "activity_budget_change_button": "Save Changes",    
+
+    "account_help_title": "Help",
+    "account_about_title": "About",
+    "account_about_language": "Choose Language",
+    "account_logout": "Log Out",
+
+    "cart_title": "Cart",
+    "cart_payments_title": "Payments",
+    "cart_payments_subtotal": "Subtotal",
+    "cart_payments_discount": "Discount",
+    "cart_payments_total_payment": "Total cost",
+    "cart_checkout_button_title": "Checkout",
+    "cart_checkout_modal_title": "Checkout",
+    "cart_checkout_modal_method_title": "Method",
+    "cart_checkout_modal_method_subtitle": "choose a method",
+    "cart_checkout_modal_method_tab_title": "Choose a Method",
+    "cart_checkout_modal_method_tab_choose": "Choose",
+    "cart_checkout_modal_total_payment": "Total cost",
+    "cart_checkout_modal_by_placing": "By placing an order you agree to our",
+    "cart_checkout_modal_terms_condition": "Terms And Conditions",
+    "cart_checkout_modal_button": "Place Order",
+
+    "favorite_title": "Favorite",
+
+    "product_detail_add_cart": "Add to Cart",
+    "product_detail_location": "Location",
+    "product_detail_desc": "Products Details",
+    "product_detail_modal_budget_title": "Set a budget",
+    "product_detail_modal_budget_hint": "Example: Rp 100.000",
+    "product_detail_modal_budget_button": "Save Changes",
+
+    "scan_title": "Scan Barcode",
+    "scan_field_hint": "Scan Barcode or input SKU",
+    
+    "branch_select_sheet": "Select Store Branch",
+
+    "history_title": "Order Notes",
+    "history_order_number": "Order Number",
+    "history_total_payment": "Total Cost",
+    "history_order_date": "Order Date",
+    "history_method_title": "Payment Method",
+    "history_order_details_title": "Order Details",
+
+    "history_invoice_title": "Download Invoice",
+    "history_invoice_subtitle": "Invoice will be saved as PDF",
+    "history_invoice_cancel": "Cancel",
+    "history_invoice_confirm": "Confirm",
+
+    "favorite_is_empty": "No favorite items yet.",
+    "history_is_empty": "You haven`t shopped yet.",
+    "activity_create_title": "Start Making Lists",
+    "activity_saved_invoice": "Invoice saved in download",
+    "cart_is_empty": "Your cart is empty",
+    "location_not_found": "This item is not available at this store branch"
+}

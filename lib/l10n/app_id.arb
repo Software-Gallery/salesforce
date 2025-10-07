@@ -1,0 +1,115 @@
+{
+    "login_header": "Selamat Datang",
+    "login_subheader": "Kamu dinantikan",
+    "login_button_label": "Masuk",
+
+    "already_have_account": "Sudah punya akun?",
+    "already_have_account_link": "Masuk",
+    "dont_have_acocunt": "Belum punya akun?",
+    "dont_have_acocunt_link": "Buat",
+
+    "signup_header": "Memulai",
+    "signup_subheader": "Masukkan kredensial Anda untuk melanjutkan",
+    "signup_button_label": "Buat",
+
+    "navigator_label_home": "Beranda",
+    "navigator_label_promo": "Promo",
+    "navigator_label_shop": "Belanja",
+    "navigator_label_activity": "Aktivitas",
+    "navigator_label_account": "Akun",
+
+    "home_welcome_word": "Hai",
+    "home_location_word": "Lokasi",
+    "home_search_word": "Mau belanja apa",
+    "home_produk_slider_title": "Penawaran Terbaik",
+    "home_produk_slider_title_new_items": "Produk baru",
+    "home_produk_slder_more": "semua",
+
+    "category_fruits_vegetables": "Buah dan Sayur",
+    "category_drink": "Minuman",
+    "category_food": "Makanan",
+    "category_home_supplies": "Perlengkapan Rumah",
+    "category_kitchen_supplies": "Kebutuhan Dapur",
+    "category_health_essentials": "Kebutuhan kesehatan",
+    "category_parcel": "Produk Parcel",
+
+    "category_choose_title": "Pilih Kategori",
+
+    "search_hint": "Cari Produk",
+
+    "activity_title": "Aktivitas",
+    "activity_tab_title_shopping_list": "Daftar Belanja",
+    "activity_tab_title_history": "Riwayat Belanja",
+    "activity_budget": "Budget",
+    "activity_clear_items": "Kosongkan",
+    "activity_add_to_cart": "Tambah Keranjang",
+
+    "activity_clear_items_modal_title": "Hapus Semua Item",
+    "activity_clear_items_modal_subtitle": "Kamu yakin ingin menghapus semua?",
+    "activity_clear_items_modal_confirm": "Ya, Hapus",
+    "activity_clear_items_modal_cancel": "Batal",
+    "activity_empty": "Daftar belanja anda kosong",
+
+    "activity_to_cart_modal_title": "Kosongkan keranjang dulu?",
+    "activity_to_cart_modal_subtitle": "Item yang sudah ada di keranjang akan dihapus",
+    "activity_to_cart_modal_confirm": "Tidak perlu",
+    "activity_to_cart_modal_cancel": "Ya, Kosongkan",
+
+    "activity_budget_change_title": "Masukkan Budget",
+    "activity_budget_change_hint": "Contoh: Rp 100.000",
+    "activity_budget_change_button": "Simpan Perubahan",
+
+    "account_help_title": "Bantuan",
+    "account_about_title": "Tentang",
+    "account_about_language": "Pilih Bahasa",
+    "account_logout": "Keluar",
+
+    "cart_title": "Keranjang",
+    "cart_payments_title": "Pembayaran",
+    "cart_payments_subtotal": "Subtotal",
+    "cart_payments_discount": "Diskon",
+    "cart_payments_total_payment": "Total bayar",
+    "cart_checkout_button_title": "Bayar",
+    "cart_checkout_modal_title": "Pembayaran",
+    "cart_checkout_modal_method_title": "Metode",
+    "cart_checkout_modal_method_subtitle": "pilih metode",
+    "cart_checkout_modal_method_tab_title": "Pilih Metode Bayar",
+    "cart_checkout_modal_method_tab_choose": "Pilih",
+    "cart_checkout_modal_total_payment": "Total Bayar",
+    "cart_checkout_modal_by_placing": "Dengan melakukan pemesanan, Anda menyetujui",
+    "cart_checkout_modal_terms_condition": "Syarat dan Ketentuan",
+    "cart_checkout_modal_button": "Buat Pesanan",
+
+    "favorite_title": "Belanja Favorit",
+
+    "product_detail_add_cart": "Tambah ke Keranjang",
+    "product_detail_location": "Lokasi",
+    "product_detail_desc": "Produk Detail",
+    "product_detail_modal_budget_title": "Masukkan Budget",
+    "product_detail_modal_budget_hint": "Contoh: Rp 100.000",
+    "product_detail_modal_budget_button": "Simpan Perubahan",
+
+    "scan_title": "Scan Barcode",
+    "scan_field_hint": "Scan Barcode atau input SKU",
+
+    "branch_select_sheet": "Pilih Cabang",
+
+    "history_title": "Nota Pesanan",
+    "history_order_number": "No. Pesanan",
+    "history_total_payment": "Total Pembayaran",
+    "history_order_date": "Tanggal Pesan",
+    "history_method_title": "Metode Pembayaran",
+    "history_order_details_title": "Rincian Pesanan",
+
+    "history_invoice_title": "Unduh Invoice",
+    "history_invoice_subtitle": "Invoice akan disimpan dalam bentuk PDF",
+    "history_invoice_cancel": "Batal",
+    "history_invoice_confirm": "Oke",
+
+    "favorite_is_empty": "Belum ada item favorit.",
+    "history_is_empty": "Anda belum berbelanja.",
+    "activity_create_title": "Mulai buat daftar",
+    "activity_saved_invoice": "Invoice tersimpan di download",
+    "cart_is_empty": "Keranjang anda kosong.",
+    "location_not_found": "Barang tidak tersedia di cabang toko ini"    
+}
