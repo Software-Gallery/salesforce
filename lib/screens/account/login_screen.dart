@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_device_imei/flutter_device_imei.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:salesforce/app.dart';
 import 'package:salesforce/common_widgets/Utils.dart';
@@ -8,6 +9,7 @@ import 'package:salesforce/config.dart';
 import 'package:salesforce/l10n/app_localizations.dart';
 import 'package:salesforce/screens/dashboard/dashboard_screen.dart';
 import 'package:salesforce/screens/home/home_screen.dart';
+import 'package:salesforce/services/RuteServices.dart';
 import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -160,8 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Password tidak boleh kosong";
-                          } else if (value.length < 8) {
-                            return "Password minimal 8 karakter";
                           }
                           return null; // Tidak ada error
                         },
@@ -207,29 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             isLoad = true;
           });
-          // await onGetStartedClicked(context);
-          // 23/09/2025 Ini diakali, harus dihapus waktu sudah bisa auth nya
-          setState(() {
-            isLoad = false;
-          });
-          Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) {
-              return DashboardScreen();
-              // return HomeScreen();
-            },
-          ));
-          // final prefs = await SharedPreferences.getInstance();
-          // print(prefs.getString('message'));
-          // print(prefs.getString('username'));
-          // print(prefs.getInt('iduser'));
-          // prefs.setString('email', _emailController.text);
-          // prefs.setString('iduser', _emailController.text);
-          // Navigator.of(context).push(new MaterialPageRoute(
-          //   builder: (BuildContext context) {
-          //     // return OTPScreen();
-          //     return DashboardScreen();
-          //   },
-          // ));
+          await onGetStartedClicked(context);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
@@ -262,7 +240,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> onGetStartedClicked(BuildContext context) async {
     try {
-      await AuthService().auth(_emailController.text, _passwordController.text);
+      String imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
+      await AuthService().auth(_emailController.text, _passwordController.text, imei);
+      final prefs = await SharedPreferences.getInstance();
+      int loginid = prefs.getInt('loginidkaryawan') ?? -1;                
+      String tglaktif = await RuteServices.getTglAktif(loginid);
+      await prefs.setString('tglaktif', tglaktif);
       Navigator.of(context).pushReplacement(new MaterialPageRoute(
         builder: (BuildContext context) {
           return DashboardScreen();

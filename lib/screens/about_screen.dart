@@ -42,7 +42,7 @@ class _AboutScreenState extends State<AboutScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            splashScreenIcon(context),
+            // splashScreenIcon(context),
             welcomeTextWidget(context),
             subtextWidget(context),
           ],
@@ -63,7 +63,7 @@ class _AboutScreenState extends State<AboutScreen> {
     return Column(
       children: [
         AppText(
-          text: "Happy Shop",
+          text: "Sales Force Application",
           fontSize: AppConfig.appSize(context, .02),
           fontWeight: FontWeight.w600,
           color: Colors.black,

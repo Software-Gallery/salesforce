@@ -65,7 +65,6 @@
     "account_logout": "Log Out",
 
     "cart_title": "Cart",
-    "cart_payments_title": "Payments",
     "cart_payments_subtotal": "Subtotal",
     "cart_payments_discount": "Discount",
     "cart_payments_total_payment": "Total cost",

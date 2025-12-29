@@ -1,4 +1,4 @@
-package com.example.salesforce
+package com.softwaregallery.salesforce
 
 import io.flutter.embedding.android.FlutterActivity
 

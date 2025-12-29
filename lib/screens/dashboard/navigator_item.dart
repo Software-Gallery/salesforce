@@ -15,9 +15,9 @@ class NavigatorItem {
 }
 
 List<NavigatorItem> navigatorItems = [
-  NavigatorItem("Beranda", "assets/icons/shop_icon.svg", 0, HomeScreen()),
-  NavigatorItem("Histori", "assets/icons/refresh.svg", 1, HistoriScreen()),
-  NavigatorItem("Akun", "assets/icons/account_icon.svg", 2, AccountScreen()),
+  NavigatorItem("Beranda", "assets/icons/home-bold.svg", 0, HomeScreen()),
+  NavigatorItem("Histori", "assets/icons/note-bold.svg", 1, HistoriScreen()),
+  NavigatorItem("Akun", "assets/icons/user-bold.svg", 2, AccountScreen()),
   // NavigatorItem("Promo", "assets/icons/promo_icon.svg", 1, PromoScreen()),
   // NavigatorItem("Belanja", "assets/icons/bag_icon.svg", 2, BelanjaScreen()),
   // NavigatorItem("Aktvitas", "assets/icons/file_icon.svg", 3, AktifitasScreen()),

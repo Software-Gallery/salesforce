@@ -33,7 +33,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   bool isFrontCamera = true;
-  late Timer _timer;
   String server = '';
 
   @override
@@ -231,7 +230,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                                 alignment: Alignment.center,
                                 transform:
                                     isFrontCamera ? Matrix4.rotationY(math.pi) : Matrix4.identity(),
-                                child: CameraPreview(_controller),
+                                child: isFrontCamera 
+                                ? Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(math.pi),
+                                  child: CameraPreview(_controller),
+                                )
+                                : CameraPreview(_controller),
                               ),
                             ),
                           ),

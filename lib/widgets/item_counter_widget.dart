@@ -5,8 +5,9 @@ import 'package:salesforce/styles/colors.dart';
 class ItemCounterWidget extends StatefulWidget {
   final Function? onAmountChanged;
   final int qty;
+  final double maxQty;
 
-  const ItemCounterWidget({Key? key, this.onAmountChanged, required int this.qty}) : super(key: key);
+  const ItemCounterWidget({Key? key, this.onAmountChanged, required int this.qty, required double this.maxQty}) : super(key: key);
 
   @override
   _ItemCounterWidgetState createState() => _ItemCounterWidgetState();
@@ -18,7 +19,7 @@ class _ItemCounterWidgetState extends State<ItemCounterWidget> {
   @override
   void initState() {
     super.initState();
-    amount = widget.qty; // Initialize amount with widget.qty
+    amount = widget.qty;
   }
 
   @override
@@ -41,6 +42,7 @@ class _ItemCounterWidgetState extends State<ItemCounterWidget> {
   }
 
   void incrementAmount() {
+    if (amount >= widget.maxQty) return;
     setState(() {
       amount = amount + 1;
       updateParent();

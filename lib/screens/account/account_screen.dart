@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:salesforce/app.dart';
 import 'package:salesforce/common_widgets/app_text.dart';
 import 'package:salesforce/config.dart';
 import 'package:salesforce/l10n/app_localizations.dart';
+import 'package:salesforce/provider/setting_provider.dart';
 import 'package:salesforce/screens/about_screen.dart';
 import 'package:salesforce/screens/account/auth_page.dart';
 import 'package:salesforce/styles/colors.dart';
@@ -34,163 +36,196 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> setUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      email = prefs.getString('email') ?? '';
-      username = prefs.getString('username') ?? '';
+      email = prefs.getString('loginemail') ?? '';
+      username = prefs.getString('loginname') ?? '';
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              ListTile(
-                leading:
-                    SizedBox(width: 65, height: 65, child: getImageHeader()),
-                title: AppText(
-                  text: username,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                subtitle: AppText(
-                  text: email,
-                  color: Color(0xff7C7C7C),
-                  fontWeight: FontWeight.normal,
-                  fontSize: 16,
-                ),
-              ),
-              Column(
+    return Consumer<SettingProvider>(
+      builder: (context, settingProvider, child) {
+        return SafeArea(
+          child: Container(
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       PageRouteBuilder(
-                  //         pageBuilder: (context, animation, secondaryAnimation) => HelpScreen(),
-                  //         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  //           // Mengatur animasi slide
-                  //           var begin = Offset(1.0, 0.0); // Mulai dari sebelah kanan
-                  //           var end = Offset.zero; // Tujuan ke posisi akhir (ke tengah)
-                  //           var curve = Curves.easeInOut;
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ListTile(
+                    leading:
+                        SizedBox(width: 65, height: 65, child: getImageHeader()),
+                    title: AppText(
+                      text: username,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    subtitle: AppText(
+                      text: email,
+                      color: Color(0xff7C7C7C),
+                      fontWeight: FontWeight.normal,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       PageRouteBuilder(
+                      //         pageBuilder: (context, animation, secondaryAnimation) => HelpScreen(),
+                      //         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      //           // Mengatur animasi slide
+                      //           var begin = Offset(1.0, 0.0); // Mulai dari sebelah kanan
+                      //           var end = Offset.zero; // Tujuan ke posisi akhir (ke tengah)
+                      //           var curve = Curves.easeInOut;
 
-                  //           var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
-                  //           var slideAnimation = animation.drive(tween);
+                      //           var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
+                      //           var slideAnimation = animation.drive(tween);
 
-                  //           return SlideTransition(
-                  //             position: slideAnimation,
-                  //             child: child,
-                  //           );
-                  //         },
-                  //       ),
-                  //     );
-                  //   },
-                  //   // child: getAccountItemWidget(accountItems[0]),
-                  //   child: Container(
-                  //     color: Colors.white,
-                  //     margin: EdgeInsets.symmetric(vertical: 15),
-                  //     padding: EdgeInsets.symmetric(horizontal: 25),
-                  //     child: Row(
-                  //       children: [
-                  //         SizedBox(
-                  //           width: 20,
-                  //           height: 20,
-                  //           child: SvgPicture.asset(
-                  //             "assets/icons/account_icons/help_icon.svg",
-                  //           ),
-                  //         ),
-                  //         SizedBox(
-                  //           width: AppConfig.appSize(context, .018),
-                  //         ),
-                  //         Text(
-                  //           AppLocalizations.of(context)!.account_help_title,
-                  //           style: TextStyle(fontSize: AppConfig.appSize(context, .016), fontWeight: FontWeight.bold),
-                  //         ),
-                  //         Spacer(),
-                  //         Icon(Icons.arrow_forward_ios)
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => AboutScreen(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            // Mengatur animasi slide
-                            var begin = Offset(1.0, 0.0); // Mulai dari sebelah kanan
-                            var end = Offset.zero; // Tujuan ke posisi akhir (ke tengah)
-                            var curve = Curves.easeInOut;
+                      //           return SlideTransition(
+                      //             position: slideAnimation,
+                      //             child: child,
+                      //           );
+                      //         },
+                      //       ),
+                      //     );
+                      //   },
+                      //   // child: getAccountItemWidget(accountItems[0]),
+                      //   child: Container(
+                      //     color: Colors.white,
+                      //     margin: EdgeInsets.symmetric(vertical: 15),
+                      //     padding: EdgeInsets.symmetric(horizontal: 25),
+                      //     child: Row(
+                      //       children: [
+                      //         SizedBox(
+                      //           width: 20,
+                      //           height: 20,
+                      //           child: SvgPicture.asset(
+                      //             "assets/icons/account_icons/help_icon.svg",
+                      //           ),
+                      //         ),
+                      //         SizedBox(
+                      //           width: AppConfig.appSize(context, .018),
+                      //         ),
+                      //         Text(
+                      //           AppLocalizations.of(context)!.account_help_title,
+                      //           style: TextStyle(fontSize: AppConfig.appSize(context, .016), fontWeight: FontWeight.bold),
+                      //         ),
+                      //         Spacer(),
+                      //         Icon(Icons.arrow_forward_ios)
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => AboutScreen(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                // Mengatur animasi slide
+                                var begin = Offset(1.0, 0.0); // Mulai dari sebelah kanan
+                                var end = Offset.zero; // Tujuan ke posisi akhir (ke tengah)
+                                var curve = Curves.easeInOut;
 
-                            var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
-                            var slideAnimation = animation.drive(tween);
+                                var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                var slideAnimation = animation.drive(tween);
 
-                            return SlideTransition(
-                              position: slideAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                     child: Container(
-                        color: Colors.white,
-                        margin: EdgeInsets.symmetric(vertical: 15),
-                        padding: EdgeInsets.symmetric(horizontal: 25),
-                        child: Row(
+                                return SlideTransition(
+                                  position: slideAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        child: Container(
+                            color: Colors.white,
+                            margin: EdgeInsets.symmetric(vertical: 15),
+                            padding: EdgeInsets.symmetric(horizontal: 25),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: SvgPicture.asset(
+                                    "assets/icons/account_icons/about_icon.svg",
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: AppConfig.appSize(context, .018),
+                                ),
+                                Text(
+                                  AppLocalizations.of(context)!.account_about_title,
+                                  style: TextStyle(fontSize: AppConfig.appSize(context, .016), fontWeight: FontWeight.bold),
+                                ),
+                                Spacer(),
+                                Icon(Icons.arrow_forward_ios)
+                              ],
+                            ),
+                          ),
+                      ),
+                      padded(
+                        Row(
                           children: [
                             SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: AppConfig.appSize(context, .018),
+                              height: AppConfig.appSize(context, .018),
                               child: SvgPicture.asset(
-                                "assets/icons/account_icons/about_icon.svg",
+                                settingProvider.isImageItem 
+                                ? "assets/icons/gallery.svg"
+                                : "assets/icons/gallery-slash.svg",
                               ),
                             ),
                             SizedBox(
                               width: AppConfig.appSize(context, .018),
                             ),
-                            Text(
-                              AppLocalizations.of(context)!.account_about_title,
-                              style: TextStyle(fontSize: AppConfig.appSize(context, .016), fontWeight: FontWeight.bold),
-                            ),
+                            Text("Gambar Barang",  style: TextStyle(fontSize: AppConfig.appSize(context, .016), fontWeight: FontWeight.bold),),
                             Spacer(),
-                            Icon(Icons.arrow_forward_ios)
+                            Switch(
+                              value: settingProvider.isImageItem,
+                              onChanged: (value) {
+                                settingProvider.toggleisImageItem(value);
+                              },
+                              activeColor: Colors.orange, // Warna saat switch dalam keadaan ON (true)
+                              inactiveTrackColor: Colors.purple, // Warna track saat switch dalam keadaan OFF (false)
+                            )
+                        
                           ],
                         ),
-                      ),
-                   ),
-                ]
-                // getChildrenWithSeperator(
-                //   widgets: accountItems.map((e) {
-                //     return getAccountItemWidget(e);
-                //   }).toList(),
-                //   seperator: Divider(
-                //     thickness: 1,
-                //   ),
-                // ),
+                      )
+                    ]
+                    // getChildrenWithSeperator(
+                    //   widgets: accountItems.map((e) {
+                    //     return getAccountItemWidget(e);
+                    //   }).toList(),
+                    //   seperator: Divider(
+                    //     thickness: 1,
+                    //   ),
+                    // ),
+                  ),
+                
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: AppConfig.appSize(context, .014)),
+                  //   child: LanguageSelector()),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  logoutButton(context),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
               ),
-             
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppConfig.appSize(context, .014)),
-                child: LanguageSelector()),
-              SizedBox(
-                height: 12,
-              ),
-              logoutButton(context),
-              SizedBox(
-                height: 20,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
+      }
+    );    
   }
 
   Widget logoutButton(BuildContext context) {
@@ -236,7 +271,7 @@ class _AccountScreenState extends State<AccountScreen> {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('email', '');
           prefs.setString('username', '');
-          prefs.setInt('iduser', 0);
+          prefs.setInt('loginid', -1);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage(),));
         },
       ),
@@ -279,6 +314,14 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
     );
   }
+
+  Widget padded(Widget widget) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: AppConfig.appSize(context, .02)),
+      child: widget,
+    );
+  }
+
 }
 
 class LanguageSelector extends StatefulWidget {

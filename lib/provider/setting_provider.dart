@@ -5,6 +5,8 @@ class SettingProvider with ChangeNotifier {
   String versi = '';
   String server = '';
 
+  bool isImageItem = false;
+
   Future<void> setUserData(String versi, String server) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     this.versi = versi;
@@ -19,4 +21,13 @@ class SettingProvider with ChangeNotifier {
     prefs.setString('CURRENTSETTING', server);
     notifyListeners();
   }
+
+  Future<bool> toggleisImageItem(bool newValue) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isImageItem = newValue;
+    notifyListeners();
+    prefs.setBool('SETTINGISIMAGEITEM', newValue);
+
+    return isImageItem;
+  }  
 }

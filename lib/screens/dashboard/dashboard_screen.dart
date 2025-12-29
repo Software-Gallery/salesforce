@@ -3,8 +3,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:salesforce/config.dart';
 import 'package:salesforce/l10n/app_localizations.dart';
 import 'package:salesforce/provider/BarangProvider.dart';
+import 'package:salesforce/services/RuteServices.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'navigator_item.dart';
 
@@ -22,8 +24,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
+        final prefs = await SharedPreferences.getInstance();
+        int loginid = prefs.getInt('loginidkaryawan') ?? -1;          
+        String tglaktif = await RuteServices.getTglAktif(loginid);
+        prefs.setString('tglaktif', tglaktif);        
         final barangProvider = Provider.of<BarangProvider>(context, listen: false);
         barangProvider.belanjaPopulateFromApi(); 
+        barangProvider.produkCartPopulateFromApi(); 
       } catch (e) {
         print(e.toString());
       }
@@ -37,21 +44,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(15),
-            topLeft: Radius.circular(15),
+            topRight: Radius.circular(20),
+            topLeft: Radius.circular(20),
           ),
           boxShadow: [
             BoxShadow(
-                color: Colors.black38.withOpacity(0.1),
+                color: Colors.black26.withOpacity(0.1),
                 spreadRadius: 0,
-                blurRadius: 37,
-                offset: Offset(0, -12)),
+                blurRadius: 20,
+                offset: Offset(0,-1)),
           ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(15),
-            topRight: Radius.circular(15),
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
           child: BottomNavigationBar(
             backgroundColor: Colors.white,
@@ -84,7 +91,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   BottomNavigationBarItem getNavigationBarItem(
       {required String label, required String iconPath, required int index}) {
     Color iconColor =
-        index == currentIndex ? AppColors.secondaryColor : Colors.black;
+        index == currentIndex ? AppColors.secondaryColor : AppColors.darkGrey;
     return BottomNavigationBarItem(
       label: label,
       icon: SvgPicture.asset(

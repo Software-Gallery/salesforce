@@ -10,6 +10,8 @@ class AppButton extends StatelessWidget {
   final Widget? trailingWidget;
   final Function? onPressed;
   final bool isOutline;
+  final bool isLoad;
+  final Color? color;
 
   const AppButton({
     Key? key,
@@ -19,7 +21,9 @@ class AppButton extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(vertical: 24),
     this.trailingWidget,
     this.onPressed,
-    this.isOutline = false
+    this.isOutline = false,
+    this.isLoad = false,
+    this.color
   }) : super(key: key);
 
   @override
@@ -36,11 +40,11 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(roundness),
           ),
           elevation: 0,
-          backgroundColor: isOutline ? Colors.white : AppColors.primaryColor,
-          foregroundColor: isOutline ? AppColors.primaryColor : Colors.white,
+          backgroundColor: color == null ? AppColors.primaryColor : color,
+          foregroundColor: Colors.white,
           side: BorderSide(
-            color: AppColors.primaryColor,  // Border color
-            width: 2.0,          // Border width
+            color: color == null ? AppColors.primaryColor : color!,
+            width: 2.0,
           ),
           textStyle: TextStyle(
             fontWeight: fontWeight,
@@ -51,6 +55,15 @@ class AppButton extends StatelessWidget {
         child: Stack(
           fit: StackFit.passthrough,
           children: <Widget>[
+            isLoad
+            ? Container(
+              width: AppConfig.appSize(context, .02),
+              height: AppConfig.appSize(context, .02),
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+            :
             Center(
               child: Text(
                 label,

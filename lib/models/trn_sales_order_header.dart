@@ -12,6 +12,7 @@ class TrmSalesOrderHeader {
   final String keterangan;
   final String status;
   final double total;
+  final String nama_customer;
   List<TrmSalesOrderDetail> listDetail;
 
 
@@ -26,7 +27,8 @@ class TrmSalesOrderHeader {
     required this.keterangan,
     required this.status,
     required this.total,
-    required this.listDetail
+    required this.listDetail,
+    required this.nama_customer
   });
 
   factory TrmSalesOrderHeader.fromJson(Map<String, dynamic> json) {
@@ -41,7 +43,8 @@ class TrmSalesOrderHeader {
       keterangan : json['keterangan'],
       status : json['status'],
       total : double.parse(json['total']),
-      listDetail: []
+      listDetail: [],
+      nama_customer: json['nama_customer']
     );
   }
 }
@@ -58,6 +61,7 @@ final List<TrmSalesOrderHeader> listSalesOrder = [
     keterangan: "Order rutin dari customer A",
     status: "OPEN",
     total: 1500000,
+    nama_customer: '',
     listDetail: [
       TrmSalesOrderDetail(
         kode_sales_order: "SO20251004-001",
@@ -94,6 +98,7 @@ final List<TrmSalesOrderHeader> listSalesOrder = [
     keterangan: "Order pertama dari customer B",
     status: "PROCESSED",
     total: 900000,
+    nama_customer: '',
     listDetail: [
       TrmSalesOrderDetail(
         kode_sales_order: "SO20251004-002",
@@ -119,6 +124,7 @@ final List<TrmSalesOrderHeader> listSalesOrder = [
     keterangan: "Order urgent dari customer C",
     status: "CLOSED",
     total: 2000000,
+    nama_customer: '',
     listDetail: [
       TrmSalesOrderDetail(
         kode_sales_order: "SO20251004-003",

@@ -1,9 +1,9 @@
 name: salesforce
-description: A new Flutter application.
+description: Absensi Sales dan Sales Order Maker
 
 publish_to: 'none'
 
-version: 1.0.1+9
+version: 0.0.1+6
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -43,12 +43,22 @@ dependencies:
   flutter_image_compress: ^2.4.0 
   geolocator: ^13.0.2
   geocoding: ^2.1.1    
-
+  dotted_border: ^3.1.0
+  quickalert: ^1.1.0
+  flutter_launcher_icons: ^0.14.4
+  syncfusion_flutter_datepicker: ^31.2.2
+  url_launcher: ^6.3.2
+  upgrader: ^12.3.0
+  flutter_device_imei: ^0.0.4
+  
   # flutter_localizations: any
   # path: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+    
+
 
 
 flutter:
@@ -76,3 +86,8 @@ flutter:
           weight: 700
         - asset: assets/fonts/gilroy/Gilroy-Bold.ttf
           weight: 900
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon.png"

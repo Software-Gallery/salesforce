@@ -5,6 +5,7 @@ import 'package:salesforce/common_widgets/app_text.dart';
 import 'package:salesforce/screens/account/auth_page.dart';
 import 'package:salesforce/screens/dashboard/dashboard_screen.dart';
 import 'package:salesforce/screens/home/home_screen.dart';
+import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/colors.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,9 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.of(context).pushReplacement(new MaterialPageRoute(
       builder: (BuildContext context) {
         // return AuthPage();
-        // return AuthService().handleAuthState();
+        return AuthService().handleAuthState();
         // return DashboardScreen();
-        return DashboardScreen();
         // return HomeScreen();
         // return AuthPage();
       },
