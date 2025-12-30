@@ -773,6 +773,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                     children: [
                                       Text(
                                         item.nama_barang,
+                                        // "${item.nama_barang.length > 25 ? item.nama_barang.substring(0, 25) : item.nama_barang}",
                                         style: TextStyle(
                                           fontSize: AppConfig.appSize(context, .014),
                                           fontWeight: FontWeight.bold,
@@ -986,7 +987,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                         final prefs = await SharedPreferences.getInstance(); 
                         int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
                         await RuteServices.selesaiAbsen(kodeSalesOrder);
-                        await TrmSalesOrderDetailServices().addDetail(kodeSalesOrder);                        
+                        // await TrmSalesOrderDetailServices().addDetail(kodeSalesOrder);                        
                         await RuteServices().sendImageToServer(_foto!, kodeSalesOrder.toString());
                         prefs.setInt('idAbsen', -1);
                         prefs.setInt('kodesalesorder', 0);
@@ -1375,7 +1376,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                   Navigator.pop(context); 
                                   Utils.showInfoSnackBar(
                                     context: context,
-                                    text: "${item.nama_barang} sudah dihapus!",
+                                    text: "${item.nama_barang.length > 20 ? item.nama_barang.substring(0, 20) : item.nama_barang}... Sudah Dihapus!",
                                     showLoad: false,
                                   );
                                 } catch (e) {
@@ -1423,7 +1424,9 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                   });
                                   if (_discCashController.text == '') _discCashController.text = '0';
                                   if (_discPersenController.text == '') _discPersenController.text = '0';
-                                  await BarangService().addBarangKeranjang(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text).then((value) {
+                                  final prefs = await SharedPreferences.getInstance(); 
+                                  int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+                                  await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder).then((value) {
                                     setState(() {
                                       isLoadSaveToCart = false;
                                     });

@@ -38,34 +38,64 @@ class TrmSalesOrderDetailServices {
     }
   }
 
-  Future<int> addDetail(int kodesalesorder) async {
+  Future<bool> addDetail(int idBarang, String qty, double? disc_cash, double? disc_perc, String ket, int kodesalesorder) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var IPConnectShared = AppConfig.api_ip;
       var IPPortShared = AppConfig.api_port;
-      int iduser = prefs.getInt('loginidkaryawan') ?? 0;
       String url = '';
       IPPortShared == ''
-        ? url =  '$IPConnectShared/api/sales-order-detail'
-        : url =  '$IPConnectShared:$IPPortShared/api/sales-order-detail';
+        ? url =  '$IPConnectShared/api/sales-order-detail/add'
+        : url =  '$IPConnectShared:$IPPortShared/api/sales-order-detail/add';
       print(url);
       Map<String, dynamic> data = {
-        'id_karyawan': iduser,
-        'kode_sales_order' : kodesalesorder.toString()
+        'kode_sales_order': kodesalesorder,
+        'id_barang': idBarang,
+        'qty': qty,
+        'disc_cash': (disc_cash ?? 0).toInt(),
+        'disc_perc': (disc_perc ?? 0).toInt(),
+        'ket': ket,
       };      
       final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
-      if (response.statusCode != 201) {
+      if (response.statusCode != 200 || response.data['statusCode'] != 200) {
         print('gagal');
-        throw(response.data['message']); 
+        throw(response.data['message']);
       }
-
-      print(response.data['data']['kode_sales_order']);
-      return response.data['data']['kode_sales_order'];
+      return true;
     } catch (e) {
       print(e);
       throw(e);
     }
   }
+
+  // Future<int> addDetail(int kodesalesorder) async {
+  //   try {
+  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     var IPConnectShared = AppConfig.api_ip;
+  //     var IPPortShared = AppConfig.api_port;
+  //     int iduser = prefs.getInt('loginidkaryawan') ?? 0;
+  //     String url = '';
+  //     IPPortShared == ''
+  //       ? url =  '$IPConnectShared/api/sales-order-detail'
+  //       : url =  '$IPConnectShared:$IPPortShared/api/sales-order-detail';
+  //     print(url);
+  //     Map<String, dynamic> data = {
+  //       'id_karyawan': iduser,
+  //       'kode_sales_order' : kodesalesorder.toString()
+  //     };      
+  //     final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
+  //     if (response.statusCode != 201) {
+  //       print('gagal');
+  //       throw(response.data['message']); 
+  //     }
+
+  //     print(response.data['data']['kode_sales_order']);
+  //     return response.data['data']['kode_sales_order'];
+  //   } catch (e) {
+  //     print(e);
+  //     throw(e);
+  //   }
+  // }
   
   static Future<bool> updateHeader(String kode_sales_order, int id_departemen, int id_customer, String keterangan,) async {
     try {

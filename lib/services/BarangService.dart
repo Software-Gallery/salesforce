@@ -105,12 +105,13 @@ class BarangService {
       var IPConnectShared = AppConfig.api_ip;
       var IPPortShared = AppConfig.api_port;
 
-      int iduser = prefs.getInt('loginidkaryawan') ?? 0;
+      // int iduser = prefs.getInt('loginidkaryawan') ?? 0;
+      int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
       
       String url = '';
       IPPortShared == ''
-        ? url =  '$IPConnectShared/api/getKeranjang?id=${iduser}'
-        : url =  '$IPConnectShared:$IPPortShared/api/getKeranjang?id=${iduser}';
+        ? url =  '$IPConnectShared/api/keranjang?id=${kodeSalesOrder}'
+        : url =  '$IPConnectShared:$IPPortShared/api/keranjang?id=${kodeSalesOrder}';
       
       print(url);
 
@@ -230,7 +231,7 @@ class BarangService {
         : url =  '$IPConnectShared:$IPPortShared/api/addKeranjang';
       print(url);
       Map<String, dynamic> data = {
-        'id_karyawan': iduser,
+        'kode_sales_order': iduser,
         'id_barang': idBarang,
         'qty': qty,
         'disc_cash': (disc_cash ?? 0).toInt(),
@@ -286,23 +287,23 @@ class BarangService {
       // var IPPortShared = await prefs.getString('IPPORT');
       var IPConnectShared = AppConfig.api_ip;
       var IPPortShared = AppConfig.api_port;
-
-      int iduser = prefs.getInt('loginidkaryawan') ?? 0;
+      int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+      // int iduser = prefs.getInt('loginidkaryawan') ?? 0;
       
       String url = '';
       IPPortShared == ''
-        ? url =  '$IPConnectShared/api/removeKeranjang'
-        : url =  '$IPConnectShared:$IPPortShared/api/removeKeranjang';
+        ? url =  '$IPConnectShared/api/sales-order-detail/delete'
+        : url =  '$IPConnectShared:$IPPortShared/api/sales-order-detail/delete';
       
       print(url);
 
       Map<String, dynamic> data = {
-        'id_karyawan': iduser,
+        'kode_sales_order': kodeSalesOrder,
         'id_barang': idBarang,
       };      
       final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
 
-      if (response.statusCode != 200 || response.data['statusCode'] != 200) {
+      if (response.statusCode != 200) {
         print('gagal');
         throw(response.data['message']);
       }

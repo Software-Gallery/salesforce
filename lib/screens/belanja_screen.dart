@@ -19,7 +19,9 @@ import 'package:salesforce/screens/barang_details_screen.dart';
 import 'package:salesforce/screens/cart_screen.dart';
 import 'package:salesforce/screens/search_screen.dart';
 import 'package:salesforce/services/BarangService.dart';
+import 'package:salesforce/services/TrnSalesOrderServices.dart';
 import 'package:salesforce/styles/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class BelanjaScreen extends StatefulWidget {
@@ -94,38 +96,6 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
         barangProvider.belanjaPopulateFromApi().then((value) {
           setState(() {
             bestDealSlideLoad = false;
-            barangGrid = Container(
-              padding: EdgeInsets.symmetric(
-              horizontal: AppConfig.appSize(context, .008)),
-              child: StaggeredGrid.count(
-                crossAxisCount: 1,
-                // I only need two card horizontally
-                children: barangProvider.itemLists.asMap().entries.map<Widget>((e) {
-                  BarangItem groceryItem = e.value;
-                  return GestureDetector(
-                    onTap: () {
-                      onItemClicked(context, groceryItem);  
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      child: BarangPromoItemCardWidget(
-                        item: groceryItem,
-                        heroSuffix: "explore_screen",
-                      ),
-                    ),
-                  );
-                }).toList(),
-                mainAxisSpacing: AppConfig.appSize(context, .002),
-                crossAxisSpacing: AppConfig.appSize(context, .001), // add some space
-              ),
-            );
-
-            // tabViewList = tabViewList.asMap().entries.map<Widget>((e) {
-            //   return SingleChildScrollView(child:               
-            //     bestDealSlideLoad
-            //     ? CircularProgressIndicator()
-            //     : barangGrid);
-            // }).toList(); 
           });
         }); 
       } catch (e) {
@@ -812,7 +782,9 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                             });
                             if (_discCashController.text == '') _discCashController.text = '0';
                             if (_discPersenController.text == '') _discPersenController.text = '0';
-                            await BarangService().addBarangKeranjang(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text).then((value) {
+                            final prefs = await SharedPreferences.getInstance(); 
+                            int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+                            await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder).then((value) {
                               setState(() {
                                 isLoadSaveToCart = false;
                               });
