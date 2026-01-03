@@ -482,32 +482,48 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                   minLines: null,
                   controller: _keteranganController,
                   focusNode: _focusNodeKeterangan,
+                  // Opsional: Autovalidate mode untuk validasi realtime
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  
                   decoration: InputDecoration(
                     filled: !_focusNodeKeterangan.hasFocus,
                     fillColor: AppColors.grey,
-                    // label: Text('Jam Server'),
                     hintText: 'Keterangan',
                     hintStyle: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w400),
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    errorStyle: TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.all(Radius.circular(10)),
-                        borderSide: _focusNodeKeterangan.hasFocus
-                            ? BorderSide(
-                                color: Colors.black,
-                                width: 2.0,
-                              )
-                            : BorderSide.none),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: _focusNodeKeterangan.hasFocus
+                          ? BorderSide(
+                              color: Colors.black,
+                              width: 2.0,
+                            )
+                          : BorderSide.none,
+                    ),
                     enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.all(Radius.circular(10)),
-                        borderSide: _focusNodeKeterangan.hasFocus
-                            ? BorderSide(
-                                color: Colors.black,
-                                width: 2.0,
-                              )
-                            : BorderSide.none),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide.none,
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                        width: 2.0,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -833,7 +849,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                     ) : Container(),
                                     SizedBox(height: AppConfig.appSize(context, .005),),
                                     AppText(
-                                      text: "${AppConfig.formatNumber(item.total.toDouble())}",
+                                      text: "${AppConfig.formatNumber(item.status == 'BONUS' ? 0 : item.total.toDouble())}",
                                       fontSize: AppConfig.appSize(context, .015),
                                       fontWeight: FontWeight.bold,
                                     ),                                    
@@ -980,6 +996,11 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                     padding: EdgeInsets.symmetric(vertical: 30),
                     onPressed: () async {
                       try {
+                        if (barangProvider.itemCartLists.length == 0 && (_keteranganController.text == null || _keteranganController.text.isEmpty)) {
+                          Utils.showActionSnackBar(context: context, text: 'Keterangan harus diisi', showLoad: false);
+                          _focusNodeKeterangan.requestFocus();
+                          return;
+                        }
                         setState(() {
                           loadKirim = true;
                         });
@@ -1046,11 +1067,12 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
     TextEditingController _discCashController = TextEditingController();
     TextEditingController _discPersenController = TextEditingController();
     TextEditingController _keteranganController = TextEditingController();
+    String? _selectedValue = item.status == '' ? 'REGULAR' : item.status;
     bool isLoadSaveToCart = false;
     bool isLoadDeleteCart = false;
     BarangItem barang = barangProvider.itemCartLists.firstWhere(
       (brg) => brg.id_barang == item.id_barang, 
-      orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0),
+      orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0, status: ''),
     );
     String recentQty = barangProvider.loadQty(item.id_barang!);
     _budgetApproveController.text=recentQty;
@@ -1069,7 +1091,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Container(
-            height: AppConfig.appSize(context, .41),
+            height: AppConfig.appSize(context, .52),
             width: double.maxFinite,
             padding: EdgeInsets.symmetric(
               vertical: AppConfig.appSize(context, .02),
@@ -1165,6 +1187,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                   // horizontal: AppConfig.appSize(context, .024),
                                 ),
                                 child: TextFormField(
+                                  enabled: _selectedValue == 'REGULAR',
                                   textInputAction: TextInputAction.done,
                                   controller: _discCashController,
                                   keyboardType: TextInputType.number,
@@ -1184,6 +1207,12 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(AppConfig.appSize(context, .014)),
                                       ),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(AppConfig.appSize(context, .014)),
+                                      ),
+                                      borderSide: BorderSide.none,
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
@@ -1207,6 +1236,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                               children: [
                                 captionForm('Diskon Persen'),
                                 TextFormField(
+                                  enabled: _selectedValue == 'REGULAR',
                                   textInputAction: TextInputAction.done,
                                   controller: _discPersenController,
                                   keyboardType: TextInputType.number,
@@ -1227,6 +1257,12 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                         Radius.circular(AppConfig.appSize(context, .014)),
                                       ),
                                     ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(AppConfig.appSize(context, .014)),
+                                      ),
+                                      borderSide: BorderSide.none,
+                                    ),                                    
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(AppConfig.appSize(context, .014)),
@@ -1280,6 +1316,116 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                       ),
                     ),
                   ),                  
+                  SizedBox(height: AppConfig.appSize(context, .01)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: captionForm('Status')
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppConfig.appSize(context, .014),
+                        vertical: AppConfig.appSize(context, .016),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(AppConfig.appSize(context, .014)),
+                        ),
+                        border: Border.all(
+                          color: Colors.transparent,
+                          width: 1,
+                        ),
+                      ),
+                      constraints: BoxConstraints(
+                        minHeight: 40,
+                      ),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        _selectedValue,
+                        style: TextStyle(
+                          color: _keteranganController.text.isNotEmpty 
+                              ? Colors.black 
+                              : Colors.grey.shade600,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),                 
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //     horizontal: AppConfig.appSize(context, .024),
+                  //   ),
+                  //   child: DropdownButtonFormField<String>(
+                  //     enableFeedback: false,
+                  //     value: _selectedValue,
+                  //     hint: Text('Status'),
+                  //     decoration: InputDecoration(
+                  //       filled: true,
+                  //       fillColor: Colors.grey.shade200,
+                  //       hintText: 'Pilihan',
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.grey.shade600,
+                  //         fontWeight: FontWeight.w400,
+                  //       ),
+                  //       focusedBorder: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide(
+                  //           color: Colors.black, // Warna border saat focus (sesuaikan)
+                  //           width: 1.0,
+                  //         ),
+                  //       ),
+                  //       enabledBorder: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide.none,
+                  //       ),
+                  //       border: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide.none,
+                  //       ),
+                  //       contentPadding: EdgeInsets.symmetric(
+                  //         horizontal: 16.0,
+                  //         vertical: 16.0,
+                  //       ),
+                  //     ),
+                  //     style: TextStyle(
+                  //       color: Colors.black,
+                  //       fontSize: 16.0,
+                  //     ),
+                  //     icon: Icon(
+                  //       Icons.arrow_drop_down,
+                  //       color: Colors.grey.shade600,
+                  //     ),
+                  //     iconSize: 24.0,
+                  //     isExpanded: true,
+                  //     onChanged: (String? newValue) {
+                  //       setState(() {
+                  //         _selectedValue = newValue;
+                  //       });
+                  //     },
+                  //     items: <String>['REGULAR', 'BONUS']
+                  //         .map<DropdownMenuItem<String>>((String value) {
+                  //       return DropdownMenuItem<String>(
+                  //         value: value,
+                  //         child: Text(value),
+                  //       );
+                  //     }).toList(),
+                  //   ),
+                  // ),       
                   SizedBox(height: AppConfig.appSize(context, .02)),
                   Padding(
                     padding: EdgeInsets.symmetric(
@@ -1370,7 +1516,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                 if (result != true) return;
                                 try {
                                   setState(() => isLoadDeleteCart = true);
-                                  await BarangService().removeBarangKeranjang(item.id_barang!);
+                                  await BarangService().removeBarangKeranjang(item.id_barang!, item.status);
                                   setState(() => isLoadDeleteCart = false);
                                   await barangProvider.produkCartPopulateFromApi();
                                   Navigator.pop(context); 
@@ -1426,7 +1572,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                   if (_discPersenController.text == '') _discPersenController.text = '0';
                                   final prefs = await SharedPreferences.getInstance(); 
                                   int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
-                                  await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder).then((value) {
+                                  await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder, _selectedValue!).then((value) {
                                     setState(() {
                                       isLoadSaveToCart = false;
                                     });

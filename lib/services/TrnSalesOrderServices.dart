@@ -38,7 +38,7 @@ class TrmSalesOrderDetailServices {
     }
   }
 
-  Future<bool> addDetail(int idBarang, String qty, double? disc_cash, double? disc_perc, String ket, int kodesalesorder) async {
+  Future<bool> addDetail(int idBarang, String qty, double? disc_cash, double? disc_perc, String ket, int kodesalesorder, String status) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var IPConnectShared = AppConfig.api_ip;
@@ -55,6 +55,7 @@ class TrmSalesOrderDetailServices {
         'disc_cash': (disc_cash ?? 0).toInt(),
         'disc_perc': (disc_perc ?? 0).toInt(),
         'ket': ket,
+        'status': status
       };      
       final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
       if (response.statusCode != 200 || response.data['statusCode'] != 200) {

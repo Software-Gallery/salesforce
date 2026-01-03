@@ -39,7 +39,7 @@ class _HistoriScreenState extends State<HistoriScreen> {
         setState(() {
           tglaktif = prefstglaktif;
           startDate = DateFormat('yyyy-MM-dd').parse(tglaktif);
-          startDate = DateFormat('yyyy-MM-dd').parse(tglaktif);
+          endDate = DateFormat('yyyy-MM-dd').parse(tglaktif);
           // startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
           // endDate = DateTime.now();
         });
@@ -294,7 +294,9 @@ void _selectDateRange(BuildContext context) async {
                                     );
                                   },
                                 ),
-                              );
+                              ).then((_) async {
+                                await ruteProvider.populateHistoriFromApi(tglaktif, tglaktif);
+                              });
                             },
                             child: visitCard(e),
                           ),
@@ -439,7 +441,7 @@ void _selectDateRange(BuildContext context) async {
                     ),
                   ),                
                   Text(
-                    '${e.totalSKU}',
+                    '${e.totalSKU.round()}',
                     style: const TextStyle(
                       fontSize: 15,
                       color: Colors.black,

@@ -532,16 +532,17 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
     TextEditingController _discCashController = TextEditingController();
     TextEditingController _discPersenController = TextEditingController();
     TextEditingController _keteranganController = TextEditingController();
+    String? _selectedValue = item.status == '' ? 'REGULAR' : item.status;
     bool isLoadSaveToCart = false;
-    BarangItem barang = barangProvider.itemCartLists.firstWhere(
-      (brg) => brg.id_barang == item.id_barang, 
-      orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0),
-    );
-    String recentQty = barangProvider.loadQty(item.id_barang!);
-    _budgetApproveController.text=recentQty;
-    _discCashController.text="${barang.disc_cash.round()}";
-    _discPersenController.text="${barang.disc_perc.round()}";
-    _keteranganController.text="${barang.ket_detail}";
+    // BarangItem barang = barangProvider.itemCartLists.firstWhere(
+    //   (brg) => brg.id_barang == item.id_barang && brg.status == item.status, 
+    //   orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0, status: ''),
+    // );
+    // String recentQty = barangProvider.loadQty(item.id_barang!);
+    // _budgetApproveController.text=recentQty;
+    // _discCashController.text="${barang.disc_cash.round()}";
+    // _discPersenController.text="${barang.disc_perc.round()}";
+    // _keteranganController.text="${barang.ket_detail}";
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -554,7 +555,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Container(
-            height: AppConfig.appSize(context, .41),
+            height: AppConfig.appSize(context, .52),
             width: double.maxFinite,
             padding: EdgeInsets.symmetric(
               vertical: AppConfig.appSize(context, .02),
@@ -650,6 +651,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                                   // horizontal: AppConfig.appSize(context, .024),
                                 ),
                                 child: TextFormField(
+                                  enabled: _selectedValue == 'REGULAR',
                                   textInputAction: TextInputAction.done,
                                   controller: _discCashController,
                                   keyboardType: TextInputType.number,
@@ -669,6 +671,12 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(AppConfig.appSize(context, .014)),
                                       ),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(AppConfig.appSize(context, .014)),
+                                      ),
+                                      borderSide: BorderSide.none,
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
@@ -692,6 +700,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                               children: [
                                 captionForm('Diskon Persen'),
                                 TextFormField(
+                                  enabled: _selectedValue == 'REGULAR',
                                   textInputAction: TextInputAction.done,
                                   controller: _discPersenController,
                                   keyboardType: TextInputType.number,
@@ -712,6 +721,12 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                                         Radius.circular(AppConfig.appSize(context, .014)),
                                       ),
                                     ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(AppConfig.appSize(context, .014)),
+                                      ),
+                                      borderSide: BorderSide.none,
+                                    ),                                    
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(AppConfig.appSize(context, .014)),
@@ -723,7 +738,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                               ],
                             ),
                           ),
-                        ),                      
+                        ),              
                       ],
                     ),
                   ),
@@ -765,6 +780,78 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                       ),
                     ),
                   ),                  
+                  SizedBox(height: AppConfig.appSize(context, .01)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: captionForm('Status')
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedValue,
+                      hint: Text('Status'),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey.shade200,
+                        hintText: 'Pilihan',
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppConfig.appSize(context, .014)),
+                          ),
+                          borderSide: BorderSide(
+                            color: Colors.black, // Warna border saat focus (sesuaikan)
+                            width: 1.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppConfig.appSize(context, .014)),
+                          ),
+                          borderSide: BorderSide.none,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppConfig.appSize(context, .014)),
+                          ),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 16.0,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                      ),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.grey.shade600,
+                      ),
+                      iconSize: 24.0,
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedValue = newValue;
+                        });
+                      },
+                      items: <String>['REGULAR', 'BONUS']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),       
                   SizedBox(height: AppConfig.appSize(context, .02)),
                   Padding(
                     padding: EdgeInsets.symmetric(
@@ -784,7 +871,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                             if (_discPersenController.text == '') _discPersenController.text = '0';
                             final prefs = await SharedPreferences.getInstance(); 
                             int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
-                            await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder).then((value) {
+                            await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder, _selectedValue!).then((value) {
                               setState(() {
                                 isLoadSaveToCart = false;
                               });

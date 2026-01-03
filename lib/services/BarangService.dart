@@ -279,7 +279,7 @@ class BarangService {
     }
   }  
 
-  Future<bool> removeBarangKeranjang(int idBarang) async {
+  Future<bool> removeBarangKeranjang(int idBarang, String status) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -300,6 +300,7 @@ class BarangService {
       Map<String, dynamic> data = {
         'kode_sales_order': kodeSalesOrder,
         'id_barang': idBarang,
+        'status': status,
       };      
       final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
 

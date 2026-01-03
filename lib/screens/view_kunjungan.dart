@@ -73,6 +73,8 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
           isCartLoad = true;
         });          
         final barangProvider = Provider.of<BarangProvider>(context, listen: false);
+        final prefs = await SharedPreferences.getInstance(); 
+        prefs.setInt('kodesalesorder', int.parse(widget.item.kode_sales_order));
         await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order).then((value) async {
           await Future.delayed(Duration(milliseconds: 500)).then((value) {
             setState(() {
@@ -301,7 +303,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                           },
                         ),
                       ).then((_) async {
-                        await barangProvider.produkCartPopulateFromApi();
+                        await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
                       });
                     } catch (e) {
                       print(e);
@@ -403,7 +405,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                                             },
                                           ),
                                         ).then((_) async {
-                                          await barangProvider.produkCartPopulateFromApi();
+                                          await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
                                         });
                                       } catch (e) {
                                         print(e); 
@@ -462,7 +464,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                           ? null
                           : () {
                             changeQtySheet(item, barangProvider).then((_) async {
-                              await barangProvider.produkCartPopulateFromApi();
+                              await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
                             });                                                        
                           },
                           child: Container(
@@ -635,10 +637,12 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
     TextEditingController _discCashController = TextEditingController();
     TextEditingController _discPersenController = TextEditingController();
     TextEditingController _keteranganController = TextEditingController();
+    String? _selectedValue = item.status == '' ? 'REGULAR' : item.status;    
     bool isLoadSaveToCart = false;
+    bool isLoadDeleteCart = false;
     BarangItem barang = barangProvider.itemtrnLists.firstWhere(
       (brg) => brg.id_barang == item.id_barang, 
-      orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0),
+      orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0, status: ''),
     );
     String recentQty = barangProvider.loadTrnQty(item.id_barang!);
     _budgetApproveController.text=recentQty;
@@ -657,7 +661,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Container(
-            height: AppConfig.appSize(context, .41),
+            height: AppConfig.appSize(context, .52),
             width: double.maxFinite,
             padding: EdgeInsets.symmetric(
               vertical: AppConfig.appSize(context, .02),
@@ -868,59 +872,300 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                       ),
                     ),
                   ),                  
-                  SizedBox(height: AppConfig.appSize(context, .02)),
+                  SizedBox(height: AppConfig.appSize(context, .01)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: captionForm('Status')
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: AppConfig.appSize(context, .024),
                     ),
                     child: Container(
-                      // padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                      child: AppButtonColor(
-                        border: null,
-                        isEnabled: true,
-                        onPressed: () async {
-                          try {
-                            setState(() {
-                              isLoadSaveToCart = true;
-                            });
-                            if (_discCashController.text == '') _discCashController.text = '0';
-                            if (_discPersenController.text == '') _discPersenController.text = '0';
-                            await BarangService().editTrnKeranjang(widget.item.kode_sales_order, item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text).then((value) {
-                              setState(() {
-                                isLoadSaveToCart = false;
-                              });
-                            });
-                            await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
-                            Navigator.pop(context);
-                            Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} berhasil ditambahkan!", showLoad: false);
-                          } catch (e) {
-                            print(e);
-                          }
-                        },
-                        content: Column(
-                          children: [
-                            isLoadSaveToCart
-                            ? Container(
-                                  width: AppConfig.appSize(context, .02),
-                                  height: AppConfig.appSize(context, .02),
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                            )
-                            : Text(
-                              'Update',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: AppConfig.appSize(context, .012),
-                                // fontWeight: FontWeight.bold,
-                                color: Colors.white
-                              ),
-                            ),
-                          ],
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppConfig.appSize(context, .014),
+                        vertical: AppConfig.appSize(context, .016),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(AppConfig.appSize(context, .014)),
                         ),
-                        color: AppColors.secondaryColor,
+                        border: Border.all(
+                          color: Colors.transparent,
+                          width: 1,
+                        ),
+                      ),
+                      constraints: BoxConstraints(
+                        minHeight: 40,
+                      ),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        _selectedValue,
+                        style: TextStyle(
+                          color: _keteranganController.text.isNotEmpty 
+                              ? Colors.black 
+                              : Colors.grey.shade600,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                  ),                            
+                  // Padding(
+                  //   padding: EdgeInsets.symmetric(
+                  //     horizontal: AppConfig.appSize(context, .024),
+                  //   ),
+                  //   child: DropdownButtonFormField<String>(
+                  //     value: _selectedValue,
+                  //     hint: Text('Status'),
+                  //     decoration: InputDecoration(
+                  //       filled: true,
+                  //       fillColor: Colors.grey.shade200,
+                  //       hintText: 'Pilihan',
+                  //       hintStyle: TextStyle(
+                  //         color: Colors.grey.shade600,
+                  //         fontWeight: FontWeight.w400,
+                  //       ),
+                  //       focusedBorder: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide(
+                  //           color: Colors.black, // Warna border saat focus (sesuaikan)
+                  //           width: 1.0,
+                  //         ),
+                  //       ),
+                  //       enabledBorder: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide.none,
+                  //       ),
+                  //       border: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.all(
+                  //           Radius.circular(AppConfig.appSize(context, .014)),
+                  //         ),
+                  //         borderSide: BorderSide.none,
+                  //       ),
+                  //       contentPadding: EdgeInsets.symmetric(
+                  //         horizontal: 16.0,
+                  //         vertical: 16.0,
+                  //       ),
+                  //     ),
+                  //     style: TextStyle(
+                  //       color: Colors.black,
+                  //       fontSize: 16.0,
+                  //     ),
+                  //     icon: Icon(
+                  //       Icons.arrow_drop_down,
+                  //       color: Colors.grey.shade600,
+                  //     ),
+                  //     iconSize: 24.0,
+                  //     isExpanded: true,
+                  //     onChanged: (String? newValue) {
+                  //       setState(() {
+                  //         _selectedValue = newValue;
+                  //       });
+                  //     },
+                  //     items: <String>['REGULAR', 'BONUS']
+                  //         .map<DropdownMenuItem<String>>((String value) {
+                  //       return DropdownMenuItem<String>(
+                  //         value: value,
+                  //         child: Text(value),
+                  //       );
+                  //     }).toList(),
+                  //   ),
+                  // ),       
+                  SizedBox(height: AppConfig.appSize(context, .02)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppConfig.appSize(context, .024),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 10,),
+                            child: AppButtonColor(
+                              border: null,
+                              isEnabled: true,
+                              onPressed: () async {
+                                final result = await showModalBottomSheet<bool>(
+                                  context: context,
+                                  isDismissible: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                  ),
+                                  builder: (context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.delete_outline,
+                                            size: 48,
+                                            color: Colors.red,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            "Hapus produk dari keranjang?",
+                                            style: Theme.of(context).textTheme.titleMedium,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            "Yakin ingin menghapus ${item.nama_barang}?",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 20),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: AppButtonColor(
+                                                  border: BorderSide(color: Colors.red, width: 1),
+                                                  isEnabled: true,
+                                                  onPressed: () => Navigator.pop(context, false),
+                                                  content: Text(
+                                                    'Batal',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: AppConfig.appSize(context, .012),
+                                                      // fontWeight: FontWeight.bold,
+                                                      color: Colors.red
+                                                    ),
+                                                  ),
+                                                  color: Colors.white,
+                                                ),
+                                              ),          
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: AppButtonColor(
+                                                  border: null,
+                                                  isEnabled: true,
+                                                  onPressed: () => Navigator.pop(context, true),
+                                                  content: Text(
+                                                    'Hapus',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: AppConfig.appSize(context, .012),
+                                                      // fontWeight: FontWeight.bold,
+                                                      color: Colors.white
+                                                    ),
+                                                  ),
+                                                  color: Colors.red,
+                                                ),
+                                              ),        
+                                            ],
+                                          ),
+                                          SizedBox(height: 10,)
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                                if (result != true) return;
+                                try {
+                                  setState(() => isLoadDeleteCart = true);
+                                  await BarangService().removeBarangKeranjang(item.id_barang!, item.status);
+                                  setState(() => isLoadDeleteCart = false);
+                                  await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
+                                  Navigator.pop(context); 
+                                  Utils.showInfoSnackBar(
+                                    context: context,
+                                    text: "${item.nama_barang.length > 20 ? item.nama_barang.substring(0, 20) : item.nama_barang}... Sudah Dihapus!",
+                                    showLoad: false,
+                                  );
+                                } catch (e) {
+                                  setState(() => isLoadDeleteCart = false);
+                                  print(e);
+                                }
+                              },
+
+                              content: Column(
+                                children: [
+                                  isLoadDeleteCart
+                                  ? Container(
+                                        width: AppConfig.appSize(context, .02),
+                                        height: AppConfig.appSize(context, .02),
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                  )
+                                  : Text(
+                                    'Hapus',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: AppConfig.appSize(context, .012),
+                                      // fontWeight: FontWeight.bold,
+                                      color: Colors.white
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        Expanded(
+                          child: Container(
+                            // padding: EdgeInsets.symmetric(horizontal: 10,),
+                            child: AppButtonColor(
+                              border: null,
+                              isEnabled: true,
+                              onPressed: () async {
+                                try {
+                                  setState(() {
+                                    isLoadSaveToCart = true;
+                                  });
+                                  if (_discCashController.text == '') _discCashController.text = '0';
+                                  if (_discPersenController.text == '') _discPersenController.text = '0';
+                                  final prefs = await SharedPreferences.getInstance(); 
+                                  int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+                                  await TrmSalesOrderDetailServices().addDetail(item.id_barang!, _budgetApproveController.text, double.parse(_discCashController.text), double.parse(_discPersenController.text), _keteranganController.text, kodeSalesOrder, _selectedValue!).then((value) {
+                                    setState(() {
+                                      isLoadSaveToCart = false;
+                                    });
+                                  });
+                                  await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
+                                  Navigator.pop(context);
+                                  Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} berhasil ditambahkan!", showLoad: false);
+                                } catch (e) {
+                                  print(e);
+                                }
+                              },
+                              content: Column(
+                                children: [
+                                  isLoadSaveToCart
+                                  ? Container(
+                                        width: AppConfig.appSize(context, .02),
+                                        height: AppConfig.appSize(context, .02),
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                  )
+                                  : Text(
+                                    'Update',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: AppConfig.appSize(context, .012),
+                                      // fontWeight: FontWeight.bold,
+                                      color: Colors.white
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              color: AppColors.secondaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   )
                 ],
               ),

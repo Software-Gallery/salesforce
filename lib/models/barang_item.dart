@@ -19,6 +19,7 @@ class BarangItem {
   String ket_detail;
   double subtotal;
   double total;
+  final String status;
 
   BarangItem({
     required this.id_barang,
@@ -40,7 +41,8 @@ class BarangItem {
     required this.disc_perc,
     required this.ket_detail,
     required this.subtotal,
-    required this.total
+    required this.total,
+    required this.status
   });
 
   factory BarangItem.fromJson(Map<String, dynamic> json) {
@@ -61,6 +63,7 @@ class BarangItem {
     if (json['disc_perc'] is int) json['disc_perc'] = json['disc_perc'].toDouble();
     if (json['subtotal'] is int) json['subtotal'] = json['subtotal'].toDouble();
     if (json['total'] is int) json['total'] = json['total'].toDouble();
+    if (json['status'] == null) json['status'] = '';
     return BarangItem(
       id_barang : json['id_barang'],
       kode_barang : json['kode_barang'],
@@ -82,6 +85,7 @@ class BarangItem {
       ket_detail : json['ket_detail'] ?? '',
       subtotal : json['subtotal'] ?? 0,
       total : json['total'] ?? 0,
+      status: json['status']
     );
   }
 }
@@ -107,7 +111,8 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
   BarangItem(
     id_barang: 2,
@@ -129,7 +134,8 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
   BarangItem(
     id_barang: 3,
@@ -151,7 +157,8 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
   BarangItem(
     id_barang: 3,
@@ -173,7 +180,8 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
   BarangItem(
     id_barang: 3,
@@ -195,7 +203,8 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
   BarangItem(
     id_barang: 3,
@@ -217,6 +226,7 @@ List<BarangItem> barangList = [
     disc_perc: 0,
     ket_detail: '',
     subtotal: 0,
-    total: 0
+    total: 0,
+    status: ''
   ),
 ];
