@@ -646,7 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "VISIT",
+                      item.jml_absen > 0 ? "RE-VISIT" : "VISIT",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,

@@ -641,11 +641,16 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
     bool isLoadSaveToCart = false;
     bool isLoadDeleteCart = false;
     BarangItem barang = barangProvider.itemtrnLists.firstWhere(
-      (brg) => brg.id_barang == item.id_barang, 
+      (brg) => brg.id_barang == item.id_barang && brg.status == item.status, 
       orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0, status: ''),
     );
-    String recentQty = barangProvider.loadTrnQty(item.id_barang!);
-    _budgetApproveController.text=recentQty;
+    if (barang.qty_besar+barang.qty_tengah+barang.qty_kecil > 0) {
+      _budgetApproveController.text = "${barang.qty_besar.toInt()}.${barang.qty_tengah.toInt()}.${barang.qty_kecil.toInt()}";
+    } else {
+      _budgetApproveController.text = "";
+    }
+    // String recentQty = barangProvider.loadTrnQty(item.id_barang!);
+    // _budgetApproveController.text=recentQty;
     _discCashController.text="${barang.disc_cash.round()}";
     _discPersenController.text="${barang.disc_perc.round()}";
     _keteranganController.text="${barang.ket_detail}";

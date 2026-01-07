@@ -191,25 +191,25 @@ void _selectDateRange(BuildContext context) async {
 
 
 
-        return Scaffold(
-          appBar: AppBar(
-            iconTheme: IconThemeData(color: Colors.white), 
-            backgroundColor: AppColors.primaryColor,
-            elevation: 0,
-            centerTitle: true,
-            title: Container(
-              child: AppText(
-                text: 'History',
-                fontWeight: FontWeight.bold,
-                fontSize: AppConfig.appSize(context, .016),
-                color: Colors.white,
-              ),
-            ),
-          ),          
-          body: SingleChildScrollView(
+        // return Scaffold(
+        //   appBar: AppBar(
+        //     iconTheme: IconThemeData(color: Colors.white), 
+        //     backgroundColor: AppColors.primaryColor,
+        //     elevation: 0,
+        //     centerTitle: true,
+        //     title: Container(
+        //       child: AppText(
+        //         text: 'History',
+        //         fontWeight: FontWeight.bold,
+        //         fontSize: AppConfig.appSize(context, .016),
+        //         color: Colors.white,
+        //       ),
+        //     ),
+        //   ),          
+          return SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: AppConfig.appSize(context, .02),),
+                // SizedBox(height: AppConfig.appSize(context, .02),),
                 padded(
                   AppButton(label: startDate == null || endDate == null ? 'Pilih Tanggal' : "${DateFormat('dd-MM-yyyy').format(startDate!)} - ${DateFormat('dd-MM-yyyy').format(endDate!)}", onPressed: () {_selectDateRange(context);}, color: AppColors.accentColor,)               
                 ),  
@@ -316,8 +316,8 @@ void _selectDateRange(BuildContext context) async {
                 SizedBox(height: AppConfig.appSize(context, .02),),
               ],
             ),
-          ),
-        );
+          );
+        // );
       }
     );
   }

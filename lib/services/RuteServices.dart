@@ -123,7 +123,7 @@ class RuteServices {
     }
   }
 
-  static Future<int> addAbsen(int id_customer, int id_departemen, String tgl, String jam_masuk, String latitude, String longitude, String keterangan, String alamat, String tipe) async {
+  static Future<int> addAbsen(int id_customer, int id_departemen, String tgl, String jam_masuk, String latitude, String longitude, String keterangan, String alamat, String tipe, int kode_sales_order) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var IPConnectShared = AppConfig.api_ip;
@@ -145,6 +145,8 @@ class RuteServices {
         'keterangan': keterangan,
         'alamat': alamat,
         'tipe': tipe,
+        'kode_sales_order': kode_sales_order,
+        
       };
       var response = await Dio(BaseOptions(connectTimeout: Duration(seconds:15))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
 

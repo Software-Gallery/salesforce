@@ -130,7 +130,7 @@ class BarangProvider extends ChangeNotifier {
 
   String loadTrnQty(int itemId) {
     BarangItem barang = itemtrnLists.firstWhere(
-      (item) => item.id_barang == itemId, 
+      (item) => item.id_barang == itemId  , 
       orElse: () => BarangItem(id_barang: -1, kode_barang: '1', id_departemen: 1, nama_barang: '', satuan_besar: 1, satuan_tengah: 1, satuan_kecil: 0, konversi_besar: 0, konversi_tengah: 0, gambar: '', is_aktif: 1, harga: 0, qty_besar: 0, qty_tengah: 0, qty_kecil: 0, disc_cash: 0, disc_perc: 0, ket_detail: '', subtotal: 0, total: 0, status: ''),
     );
 
