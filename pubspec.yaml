@@ -3,7 +3,7 @@ description: Absensi Sales dan Sales Order Maker
 
 publish_to: 'none'
 
-version: 0.0.1+8
+version: 0.0.1+10
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -21,7 +21,6 @@ dependencies:
   vibration: ^2.0.0
   qr_code_scanner_plus: ^2.0.12
   font_awesome_flutter: ^10.7.0
-  audioplayers: ^6.1.0
   intl: ^0.20.2
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
@@ -35,9 +34,7 @@ dependencies:
   share_plus: ^10.1.0
   cached_network_image: ^3.4.1
   package_info_plus: ^8.1.0
-  marquee: ^2.3.0  
   toastification: ^2.3.0
-  slide_digital_clock_fork: ^1.0.4
   camera: ^0.11.0+2
   image: ^4.1.3
   flutter_image_compress: ^2.4.0 

@@ -23,7 +23,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:slide_digital_clock_fork/slide_digital_clock_fork.dart';
 import 'package:flutter_device_imei/flutter_device_imei.dart';
 import 'package:url_launcher/url_launcher.dart';
 class HomeScreen extends StatefulWidget {
@@ -76,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         );
         final ruteProvider = Provider.of<RuteProvider>(context, listen: false);
-        await ruteProvider.populateTotal(totalCurrent.name);
+        // await ruteProvider.populateTotal(totalCurrent.name);
         await ruteProvider.populateFromApi().then((value) async {
           await Future.delayed(Duration(milliseconds: 500)).then((value) {
             setState(() {
@@ -376,10 +375,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     horizontal: 20,
                                   ),
                                   width: double.maxFinite,
-                                  child: 
-                                  Skeleton.leaf(
-                                    child: visitCard(e, () {})
-                                  )
+                                  child: visitCard(e, () {}),                                  
+                                  // child: 
+                                  // Skeleton.leaf(
+                                  //   child: visitCard(e, () {})
+                                  // )
                                 );
                               }).toList(),
                               seperator: Padding(
@@ -634,7 +634,7 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: EdgeInsets.only(left: 5),
               padding: EdgeInsets.all(AppConfig.appSize(context, .01)),
               decoration: BoxDecoration(
-                color: item.jml_absen > 0 ? Colors.amber : AppColors.secondaryColor,
+                color: item.jumlah_nota > 0 ? Colors.amber : AppColors.secondaryColor,
                 borderRadius: BorderRadius.circular(AppConfig.appSize(context, .01))
               ),
               // height: AppConfig.appSize(context, .04),
@@ -646,7 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.jml_absen > 0 ? "RE-VISIT" : "VISIT",
+                      item.jumlah_nota > 0 ? "RE-VISIT" : "VISIT",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
@@ -880,6 +880,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (choice == 'logout') {
                             final prefs = await SharedPreferences.getInstance();
                             prefs.setInt('loginid', -1);
+                            prefs.setString('token', '');
                             Navigator.of(context).pushReplacement(new MaterialPageRoute(
                               builder: (BuildContext context) {
                                 return AuthPage();

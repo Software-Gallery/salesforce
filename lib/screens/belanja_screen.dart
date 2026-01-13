@@ -37,6 +37,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
   bool bestDealSlideLoad = true;
   Widget categoriesHorizontalScroll = Container();
   late FocusNode _focusNodeSearch;
+  bool _onlyStock = false;
 
   TextEditingController _searchApproveController = TextEditingController();    
 
@@ -123,6 +124,30 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
           padding: EdgeInsets.symmetric(horizontal: AppConfig.appSize(context, .008)),
           child: Column(
             children: [
+              Row(
+                children: [
+                  // Spacer(),
+                  Text(
+                    'Stock Only',
+                    style: TextStyle(
+                      fontSize: AppConfig.appSize(context, .012),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    softWrap: true, // Allow text to wrap
+                    maxLines: null, // Allow unlimited lines
+                  ),                  
+                  Checkbox(
+                    value: _onlyStock,
+                    onChanged: (value) {
+                      setState(() {
+                        _onlyStock = value ?? false;
+                      });
+                    },
+                    activeColor: Colors.orange,
+                    checkColor: Colors.white,
+                  ),
+                ],
+              ),
               SkeletonLoader(
                 isLoading: bestDealSlideLoad,
                 skeleton: Skeletonizer(
@@ -160,7 +185,9 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                 ), 
                 child: StaggeredGrid.count(
                   crossAxisCount: 1,
-                  children: barangProvider.itemSearchLists.map<Widget>((barangItem) {
+                  children: barangProvider.itemSearchLists
+                  .where((e) => e.qty_besar+e.qty_tengah+e.qty_kecil > 0  || !_onlyStock)
+                  .map<Widget>((barangItem) {
                     return 
                     settingProvider.isImageItem 
                     ? GestureDetector(
@@ -878,7 +905,7 @@ class BelanjaScreenState extends State<BelanjaScreen> with SingleTickerProviderS
                             });
                             await barangProvider.produkCartPopulateFromApi();
                             Navigator.pop(context);
-                            Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} berhasil ditambahkan!", showLoad: false);
+                            Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} ditambahkan!", showLoad: false);
                           } catch (e) {
                             print(e);
                           }

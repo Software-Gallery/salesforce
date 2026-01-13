@@ -80,9 +80,13 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final ruteProvider = Provider.of<RuteProvider>(context, listen: false);
-        if (ruteProvider.ruteCurrent != null || ruteProvider.ruteCurrent!.id_absen != -1) {
+        // final prefs = await SharedPreferences.getInstance(); 
+        // prefs.setInt('kodesalesorder', 0);
+        //  int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+        // if (kodeSalesOrder != 0) {
           setState(() {
             isCartLoad = true;
+            _keteranganController.text = ruteProvider.ruteCurrent!.keterangan;
           });          
           final barangProvider = Provider.of<BarangProvider>(context, listen: false);
           await barangProvider.produkCartPopulateFromApi().then((value) async {
@@ -92,7 +96,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
               });
             });
           });     
-        }
+        // }
       } catch (e) {
         print(e.toString());
       }
@@ -997,7 +1001,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                     padding: EdgeInsets.symmetric(vertical: 30),
                     onPressed: () async {
                       try {
-                        if (barangProvider.itemCartLists.length == 0 && (_keteranganController.text == null || _keteranganController.text.isEmpty)) {
+                        if (barangProvider.totaltambah == 0 && (_keteranganController.text.trim() == '' || _keteranganController.text.isEmpty)) {
                           Utils.showActionSnackBar(context: context, text: 'Keterangan harus diisi', showLoad: false);
                           _focusNodeKeterangan.requestFocus();
                           return;
@@ -1008,7 +1012,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                         await kirimVisit();
                         final prefs = await SharedPreferences.getInstance(); 
                         int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
-                        await RuteServices.selesaiAbsen(kodeSalesOrder);
+                        await RuteServices.selesaiAbsen(kodeSalesOrder,_keteranganController.text);
                         // await TrmSalesOrderDetailServices().addDetail(kodeSalesOrder);                        
                         await RuteServices().sendImageToServer(_foto!, kodeSalesOrder.toString());
                         prefs.setInt('idAbsen', -1);
@@ -1584,7 +1588,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                   });
                                   await barangProvider.produkCartPopulateFromApi();
                                   Navigator.pop(context);
-                                  Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} berhasil ditambahkan!", showLoad: false);
+                                  Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} ditambahkan!", showLoad: false);
                                 } catch (e) {
                                   print(e);
                                 }

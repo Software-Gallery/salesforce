@@ -168,7 +168,7 @@ class RuteServices {
     }
   }
 
-  static Future<bool> selesaiAbsen(int kodeSalesOrder) async {
+  static Future<bool> selesaiAbsen(int kodeSalesOrder, String keterangan) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       var IPConnectShared = AppConfig.api_ip;
@@ -181,7 +181,8 @@ class RuteServices {
       
       Map<String, dynamic> data = {
         'id_absen': idAbsen,
-        'kode_sales_order': kodeSalesOrder 
+        'kode_sales_order': kodeSalesOrder,
+        'keterangan': keterangan
       };
       var response = await Dio(BaseOptions(connectTimeout: Duration(seconds: 10))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
 
@@ -251,14 +252,14 @@ class RuteServices {
     }
   }
 
-  Future<List<RuteItem>> getHistori(String startDate, String endDate, int id) async {
+  Future<List<RuteItem>> getHistori(String startDate, String endDate, int id, int id_customer) async {
     try {
       var IPConnectShared = AppConfig.api_ip;
       var IPPortShared = AppConfig.api_port;
       String url = '';
       IPPortShared == ''
-        ? url =  '$IPConnectShared/api/absen-histori?id=$id&startDate=${startDate}&endDate=${endDate}'
-        : url =  '$IPConnectShared:$IPPortShared/api/absen-histori?id=$id&startDate=${startDate}&endDate=${endDate}';
+        ? url =  '$IPConnectShared/api/absen-histori?id=$id&startDate=${startDate}&endDate=${endDate}&id_customer=${id_customer == -999 ? '' : id_customer}'
+        : url =  '$IPConnectShared:$IPPortShared/api/absen-histori?id=$id&startDate=${startDate}&endDate=${endDate}&id_customer=${id_customer == -999 ? '' : id_customer}';
       print(url);
       final response = await Dio().get(url);
       Map<String, dynamic> responseData;

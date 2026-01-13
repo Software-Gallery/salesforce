@@ -11,7 +11,36 @@ class RuteProvider with ChangeNotifier {
   RuteItem? ruteCurrent;
   String currentSort = 'Customer A-Z';
   String currentSortAdditional = 'Customer A-Z';
+  String currentSortHistory = 'Customer A-Z';
   int total = 0;
+  int totalValueNota = 0;
+  double averageSKU = 0;
+  int distinctCustomerCount = 0;
+
+  void hitungStatistik() {
+    totalValueNota = historiLists.fold<int>(
+      0,
+      (sum, item) => sum + item.totalValue.round(),
+    );
+
+    if (historiLists.isNotEmpty) {
+      final totalSku = historiLists.fold<double>(
+        0,
+        (sum, item) => sum + item.totalSKU,
+      );
+      averageSKU = (totalSku / historiLists.length);
+      averageSKU = double.parse(averageSKU % 1 == 0
+        ? averageSKU.toInt().toString()
+        : averageSKU.toStringAsFixed(1));
+
+    } else {
+      averageSKU = 0;
+    }
+
+
+    distinctCustomerCount =
+        historiLists.map((e) => e.id_customer).toSet().length;
+  }
 
   Future<void> populateFromApi() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -41,13 +70,14 @@ class RuteProvider with ChangeNotifier {
 
 
   
-  Future<void> populateHistoriFromApi(String startDate, String endDate) async {
+  Future<void> populateHistoriFromApi(String startDate, String endDate, int id_customer) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? idKaryawan = await prefs.getInt('loginidkaryawan'); 
     if (idKaryawan == null) return;
-    List<RuteItem> listItem = await RuteServices().getHistori(startDate, endDate, idKaryawan);
+    List<RuteItem> listItem = await RuteServices().getHistori(startDate, endDate, idKaryawan, id_customer);
     historiLists = listItem;
     print(itemLists);
+    hitungStatistik();
     notifyListeners();
   }
 
@@ -101,6 +131,11 @@ class RuteProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeSortHistory(String sort) {
+    currentSortHistory = sort;
+    notifyListeners();
+  }
+
   void sortByStatus(bool sortAdditional) {
     final list = sortAdditional ? additionalLists : tempItemLists;
     final sortBy = sortAdditional ? currentSortAdditional : currentSort;
@@ -128,6 +163,56 @@ class RuteProvider with ChangeNotifier {
 
       case 'Overdue Terbesar':
         sortByOutstandingBalanceDesc(list);
+        break;
+
+      default:
+        print('Status tidak valid');
+    }
+  }
+
+  void sortByStatusHistory() {
+    final list = historiLists;
+    final sortBy = currentSortHistory;
+
+    switch (sortBy) {
+      case 'Customer A-Z':
+        sortByCustomerNameAsc(list);
+        break;
+
+      case 'Customer Z-A':
+        sortByCustomerNameDesc(list);
+        break;
+
+      case 'Tanggal Terkecil':
+        sortByTanggalAsc(list);
+        break;
+
+      case 'Tanggal Terbesar':
+        sortByTanggalDesc(list);
+        break;
+
+      case 'Nomor Nota Terkecil':
+        sortByNomorAsc(list);
+        break;
+
+      case 'Nomor Nota Terbesar':
+        sortByNomorDesc(list);
+        break;
+
+      case 'Total SKU Terkecil':
+        sortByTotalSKUAsc(list);
+        break;
+
+      case 'Total SKU Terbesar':
+        sortByTotalSKUDesc(list);
+        break;
+
+      case 'Total Value Terkecil':
+        sortByTotalValueAsc(list);
+        break;
+
+      case 'Total Value Terbesar':
+        sortByTotalValueDesc(list);
         break;
 
       default:
@@ -165,5 +250,47 @@ class RuteProvider with ChangeNotifier {
     items.sort((a, b) => a.sisa_piutang.compareTo(b.sisa_piutang));
     notifyListeners();
   }
+
+  // Sort History
+  void sortByTanggalAsc(List items) {
+    items.sort((a, b) => a.tgl.compareTo(b.tgl));
+    notifyListeners();
+  }  
+
+  void sortByTanggalDesc(List items) {
+    items.sort((a, b) => b.tgl.compareTo(a.tgl));
+    notifyListeners();
+  }
+
+  void sortByNomorAsc(List items) {
+    items.sort((a, b) => a.kode_sales_order.compareTo(b.kode_sales_order));
+    notifyListeners();
+  }  
+
+  void sortByNomorDesc(List items) {
+    items.sort((a, b) => b.kode_sales_order.compareTo(a.kode_sales_order));
+    notifyListeners();
+  }
+
+  void sortByTotalSKUAsc(List items) {
+    items.sort((a, b) => a.totalSKU.compareTo(b.totalSKU));
+    notifyListeners();
+  }  
+
+  void sortByTotalSKUDesc(List items) {
+    items.sort((a, b) => b.totalSKU.compareTo(a.totalSKU));
+    notifyListeners();
+  }
+
+  void sortByTotalValueAsc(List items) {
+    items.sort((a, b) => a.totalValue.compareTo(b.totalValue));
+    notifyListeners();
+  }  
+
+  void sortByTotalValueDesc(List items) {
+    items.sort((a, b) => b.totalValue.compareTo(a.totalValue));
+    notifyListeners();
+  }
+
 
 }

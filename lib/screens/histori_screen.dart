@@ -8,6 +8,7 @@ import 'package:salesforce/common_widgets/app_text.dart';
 import 'package:salesforce/common_widgets/skeleton_loader.dart';
 import 'package:salesforce/config.dart';
 import 'package:salesforce/helpers/column_with_seprator.dart';
+import 'package:salesforce/models/customer_item.dart';
 import 'package:salesforce/models/rute_item.dart';
 import 'package:salesforce/models/trn_sales_order_header.dart';
 import 'package:salesforce/provider/RuteProvider.dart';
@@ -19,7 +20,11 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:intl/intl.dart';
 
 class HistoriScreen extends StatefulWidget {
-  const HistoriScreen({super.key});
+  final DateTime startDate;
+  final DateTime endDate;
+  final CustomerItem customer;
+  final VoidCallback onPopulate;
+  const HistoriScreen({super.key, required this.startDate, required this.endDate, required this.customer, required this.onPopulate()});
 
   @override
   State<HistoriScreen> createState() => _HistoriScreenState();
@@ -28,24 +33,16 @@ class HistoriScreen extends StatefulWidget {
 class _HistoriScreenState extends State<HistoriScreen> {
   bool isTrnLoad = true;
   String tglaktif = '2025-12-31';
+  String _selectedFilter = '';  
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final prefstglaktif = await prefs.getString('tglaktif') ?? '';
-        setState(() {
-          tglaktif = prefstglaktif;
-          startDate = DateFormat('yyyy-MM-dd').parse(tglaktif);
-          endDate = DateFormat('yyyy-MM-dd').parse(tglaktif);
-          // startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
-          // endDate = DateTime.now();
-        });
         final ruteProvider = Provider.of<RuteProvider>(context, listen: false);
-        // DateFormat('yyyy-MM-dd').format(endDate!)
-        await ruteProvider.populateHistoriFromApi(tglaktif, tglaktif).then((value) async {
+        // DateFormat('yyyy-MM-dd').format(widget.endDate!)
+        await ruteProvider.populateHistoriFromApi(DateFormat('yyyy-MM-dd').format(widget.startDate), DateFormat('yyyy-MM-dd').format(widget.endDate), widget.customer.id).then((value) async {
           await Future.delayed(Duration(milliseconds: 500)).then((value) {
             setState(() {
               isTrnLoad = false;
@@ -66,13 +63,6 @@ class _HistoriScreenState extends State<HistoriScreen> {
     });
   }
 
-  void setDateRange() {
-    setState(() {
-      startDate = DateTime.now().subtract(Duration(days: 3));
-      endDate = DateTime.now();
-    });
-  }
-
   Future<void> loadPref() async {
     final prefs = await SharedPreferences.getInstance();
     final prefstglaktif = await prefs.getString('tglaktif') ?? '';
@@ -80,117 +70,11 @@ class _HistoriScreenState extends State<HistoriScreen> {
       tglaktif = prefstglaktif;
     });
   }  
-
-  DateTime? startDate;
-  DateTime? endDate;
   
   @override
   Widget build(BuildContext context) {
     return Consumer<RuteProvider>(
       builder: (context, ruteProvider, child) {
-
-        Future<void> _fetchData() async {
-          if (startDate != null && endDate != null) {
-            await ruteProvider.populateHistoriFromApi(
-              DateFormat('yyyy-MM-dd').format(startDate!),
-              DateFormat('yyyy-MM-dd').format(endDate!),
-            ).then((value) async {
-              await Future.delayed(Duration(milliseconds: 500)).then((value) {
-                setState(() {
-                  isTrnLoad = false;
-                });
-              });
-            });
-          }
-        }
-
-void _selectDateRange(BuildContext context) async {
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0), // Menambahkan border radius
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: AppConfig.appSize(context, .02),),
-            SfDateRangePicker(
-              backgroundColor: Colors.white,
-              // startRangeSelectionColor: AppColors.primaryColor,
-              // endRangeSelectionColor: AppColors.primaryColor,
-              // selectionColor: AppColors.primaryColor,
-              headerStyle: DateRangePickerHeaderStyle(
-                textAlign: TextAlign.center,
-                backgroundColor: Colors.white,
-              ),
-              showNavigationArrow: false,
-              // rangeSelectionColor: const Color.fromARGB(102, 255, 102, 0),
-              view: DateRangePickerView.month,
-              selectionMode: DateRangePickerSelectionMode.range,
-              onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                setState(() {
-                  // Mengambil tanggal mulai dan tanggal akhir dari rentang yang dipilih
-                  startDate = args.value.startDate;
-                  endDate = args.value.endDate;
-                });
-              },
-              onSubmit: (Object? value) {
-                // Ketika rentang tanggal telah dipilih, simpan hasilnya
-                if (value is PickerDateRange) {
-                  setState(() {
-                    startDate = value.startDate;
-                    endDate = value.endDate;
-                  });
-                }
-                Navigator.of(context).pop();
-              },
-              onCancel: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      if (startDate != null && endDate != null) {
-                        _fetchData();
-                      } else {
-                        Utils.showActionSnackBar(
-                          context: context,
-                          text: 'Pilih rentang tanggal terlebih dahulu',
-                          showLoad: false,
-                        );
-                      }
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Oke',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
-
-
         // return Scaffold(
         //   appBar: AppBar(
         //     iconTheme: IconThemeData(color: Colors.white), 
@@ -205,14 +89,87 @@ void _selectDateRange(BuildContext context) async {
         //         color: Colors.white,
         //       ),
         //     ),
-        //   ),          
+        //   ),
           return SingleChildScrollView(
             child: Column(
               children: [
-                // SizedBox(height: AppConfig.appSize(context, .02),),
-                padded(
-                  AppButton(label: startDate == null || endDate == null ? 'Pilih Tanggal' : "${DateFormat('dd-MM-yyyy').format(startDate!)} - ${DateFormat('dd-MM-yyyy').format(endDate!)}", onPressed: () {_selectDateRange(context);}, color: AppColors.accentColor,)               
-                ),  
+                // SizedBox(height: AppConfig.appSize(context, .02),), 
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        // padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            _buildFilterChip('DRAFT', AppColors.accentColor),
+                            const SizedBox(width: 6),
+                            _buildFilterChip('POSTED', Colors.amber),
+                            const SizedBox(width: 6),
+                            _buildFilterChip('FINISH', AppColors.secondaryColor),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            backgroundColor: Colors.white,
+                            showDragHandle: true,
+                            useSafeArea: true,
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return DraggableScrollableSheet(
+                                snapSizes: [0.5,0.9],
+                                initialChildSize: 0.9,
+                                expand: false,
+                                builder: (_, controller) => _SortingSheetContent(
+                                  selectedStatus: ruteProvider.currentSortHistory,
+                                  controller: controller,), 
+                              );
+                            },
+                          );  
+                        },                              
+                        child: Container(
+                          // width: AppConfig.appSize(context, .03),
+                          height: AppConfig.appSize(context, .03),
+                          padding: EdgeInsets.symmetric(horizontal: AppConfig.appSize(context, .012), vertical: AppConfig.appSize(context, .006)),
+                          decoration: BoxDecoration(
+                            // borderRadius: BorderRadius.circular(AppConfig.appSize(context, .01)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade300)
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Colors.black.withOpacity(0.08),
+                            //     blurRadius: 10,
+                            //     offset: const Offset(0, 4),
+                            //   ),
+                            // ],                          
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Sort',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: AppConfig.appSize(context, .011),
+                                ),
+                              ),
+                              SizedBox(width: AppConfig.appSize(context, .01),),
+                              SvgPicture.asset(
+                                'assets/icons/filter.svg',
+                                color: Colors.black,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ), 
                 SkeletonLoader(
                   isLoading: isTrnLoad,
                   skeleton: Skeletonizer(
@@ -227,12 +184,11 @@ void _selectDateRange(BuildContext context) async {
                         widgets: ruteList.map((e) {
                           return Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: 20,
+                              horizontal: 10,
                             ),
                             width: double.maxFinite,
-                            child: Skeleton.leaf(
-                                child: visitCard(e,)
-                              )
+                            // child: Skeleton.leaf(child: visitCard(e,))
+                            child: visitCard(e,),
                           );
                         }).toList(),
                         seperator: Padding(
@@ -266,10 +222,12 @@ void _selectDateRange(BuildContext context) async {
                     children: 
                     getChildrenWithSeperator(
                       addToLastChild: false,
-                      widgets: ruteProvider.historiLists.map((e) {
+                      widgets: ruteProvider.historiLists
+                      .where((e) => e.status == _selectedFilter || _selectedFilter == '')
+                      .map((e) {
                         return  Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 20,
+                            horizontal: 10,
                           ),
                           width: double.maxFinite,
                           child: GestureDetector(
@@ -295,7 +253,9 @@ void _selectDateRange(BuildContext context) async {
                                   },
                                 ),
                               ).then((_) async {
-                                await ruteProvider.populateHistoriFromApi(tglaktif, tglaktif);
+                                widget.onPopulate();
+                                final prefs = await SharedPreferences.getInstance(); 
+                                prefs.setInt('kodesalesorder', 0);
                               });
                             },
                             child: visitCard(e),
@@ -328,6 +288,40 @@ void _selectDateRange(BuildContext context) async {
       child: widget,
     );
   }    
+
+Widget _buildFilterChip(String label, Color _color) {
+    final isSelected = _selectedFilter == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (_selectedFilter == label) {
+             _selectedFilter = '';
+          } else {
+            _selectedFilter = label;
+          }
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal:  AppConfig.appSize(context, .012), vertical: AppConfig.appSize(context, .005)),
+        decoration: BoxDecoration(
+          color: isSelected ? _color : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _color,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : _color,
+            fontWeight: FontWeight.bold,
+            fontSize: AppConfig.appSize(context, .011),
+          ),
+        ),
+      ),
+    );
+  }  
 
   Widget visitCard(RuteItem e) {
     return Card(
@@ -469,6 +463,162 @@ void _selectDateRange(BuildContext context) async {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SortingSheetContent extends StatefulWidget {
+  final ScrollController controller;
+  final String? selectedStatus;   // <-- tambah parameter
+
+  _SortingSheetContent({
+    required this.controller,
+    this.selectedStatus,          // <-- terima di constructor
+  });
+
+  @override
+  __SortingSheetContentState createState() => __SortingSheetContentState();
+}
+
+class __SortingSheetContentState extends State<_SortingSheetContent> {
+  String? selectedStatus;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // isi dari parameter widget
+    selectedStatus = widget.selectedStatus ?? 'Customer A-Z';
+  }
+  bool isAscending = true; // Default ke ascending
+  List<String> listStatus = [
+    'Customer A-Z',
+    'Customer Z-A',
+    'Tanggal Terkecil',
+    'Tanggal Terbesar',
+    'Nomor Nota Terkecil',
+    'Nomor Nota Terbesar',
+    'Total SKU Terkecil',
+    'Total SKU Terbesar',
+    'Total Value Terkecil',
+    'Total Value Terbesar',
+  ];
+
+  void toggleSortDirection(String status) {
+    setState(() {
+      if (selectedStatus == status) {
+        // Jika status yang sama diklik, ubah arah sorting
+        isAscending = !isAscending;
+      } else {
+        // Jika memilih status baru, reset ke ascending
+        selectedStatus = status;
+        isAscending = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: widget.controller,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Judul
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Pilih Sorting',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+
+                // Daftar Status dengan Radio Buttons
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: listStatus.map((status) {
+                    return InkWell(
+                      onTap: () => toggleSortDirection(status),
+                      child: Row(
+                        children: [
+                          Radio<String>(
+                            value: status,
+                            groupValue: selectedStatus,
+                            onChanged: (value) {
+                              // Tetap gunakan toggle untuk memastikan perubahan logika
+                              toggleSortDirection(value!);
+                            },
+                            activeColor: AppColors.accentColor,
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Text(
+                                  status,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                // if (selectedStatus == status)
+                                //   Padding(
+                                //     padding: const EdgeInsets.only(left: 8.0),
+                                //     child: 
+                                //     Icon(
+                                //        isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                                //        size: 18,
+                                //     )
+                                //   ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                SizedBox(height: 100),
+              ],
+            ),
+          ),
+          // Tombol Sticky di Bawah
+          selectedStatus != null
+              ? Positioned(
+                  bottom: 30,
+                  left: 16,
+                  right: 16,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.all(18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      final jobprovider =
+                          Provider.of<RuteProvider>(context, listen: false);
+                      jobprovider.changeSortHistory(
+                          selectedStatus ?? 'Customer A-Z');
+                      jobprovider.sortByStatusHistory();
+
+                      Navigator.pop(context, selectedStatus);
+                    },
+                    child: const Text('Terapkan Sorting', style: TextStyle(fontWeight: FontWeight.bold),),
+                  ),
+                )
+              : Container(),
+        ],
       ),
     );
   }

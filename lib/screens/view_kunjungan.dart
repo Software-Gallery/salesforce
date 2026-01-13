@@ -88,7 +88,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
     });    
   }  
 
-  Future<void> loadAll() async {
+  void loadAll() {
     setState(() {
       _keteranganController.text= widget.item.keterangan;
     });    
@@ -602,7 +602,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                           setState(() {
                             loadMulai = true;
                           });
-                          await TrmSalesOrderDetailServices.updateHeader(widget.item.kode_sales_order, widget.item.id_departemen, widget.item.id_customer, widget.item.keterangan);
+                          await TrmSalesOrderDetailServices.updateHeader(widget.item.kode_sales_order, widget.item.id_departemen, widget.item.id_customer, _keteranganController.text);
                           setState(() {
                             loadMulai = false;
                           });
@@ -1139,7 +1139,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                                   });
                                   await barangProvider.produkTrnPopulateFromApi(widget.item.kode_sales_order);
                                   Navigator.pop(context);
-                                  Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} berhasil ditambahkan!", showLoad: false);
+                                  Utils.showSuccessSnackBar(context: context, text: "${item.nama_barang} ditambahkan!", showLoad: false);
                                 } catch (e) {
                                   print(e);
                                 }
