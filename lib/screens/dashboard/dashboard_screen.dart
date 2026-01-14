@@ -28,9 +28,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         int loginid = prefs.getInt('loginidkaryawan') ?? -1;          
         String tglaktif = await RuteServices.getTglAktif(loginid);
         prefs.setString('tglaktif', tglaktif);        
-        final barangProvider = Provider.of<BarangProvider>(context, listen: false);
-        barangProvider.belanjaPopulateFromApi(); 
-        barangProvider.produkCartPopulateFromApi(); 
+        // final barangProvider = Provider.of<BarangProvider>(context, listen: false);
+        // barangProvider.belanjaPopulateFromApi(); 
+        // barangProvider.produkCartPopulateFromApi(); 
       } catch (e) {
         print(e.toString());
       }

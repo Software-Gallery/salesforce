@@ -67,11 +67,11 @@ class BarangProvider extends ChangeNotifier {
   Future<void> produkCartPopulateFromApi() async {
     List<BarangItem> listItem = await BarangService().getBarangKeranjang();
     itemCartLists = listItem;
-    HitungTotalTambah();
+    await HitungTotalTambah();
     notifyListeners();
   }
 
-  void HitungTotalTambah() {
+  Future<void> HitungTotalTambah() async {
     subtotaltambah = 0;
     totaltambah = 0;
     itemCartLists.forEach((item) {

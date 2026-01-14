@@ -164,6 +164,7 @@ class AuthService {
       Map<String, dynamic> responseData = response.data;
       await getProfile(responseData['token']);
       prefs.setString('token', responseData['token']); 
+      prefs.setInt('kodesalesorder', 0);
       print("Login success");
       return true;
     } catch (e) {
