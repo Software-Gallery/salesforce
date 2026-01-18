@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_imei/flutter_device_imei.dart';
@@ -240,7 +241,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> onGetStartedClicked(BuildContext context) async {
     try {
-      String imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
+      String imei = '';
+      
+      if (Platform.isAndroid) {
+        imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
+      }
       await AuthService().auth(_emailController.text, _passwordController.text, imei);
       final prefs = await SharedPreferences.getInstance();
       int loginid = prefs.getInt('loginidkaryawan') ?? -1;                

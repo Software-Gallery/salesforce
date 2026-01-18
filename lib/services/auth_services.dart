@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_imei/flutter_device_imei.dart';
 import 'package:intl/intl.dart';
@@ -72,7 +75,12 @@ class AuthService {
   Future<bool> checkLoginSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final imei = await FlutterDeviceImei.instance.getIMEI();
+      String imei = '';
+      if (!kIsWeb) {
+        if (Platform.isAndroid) {
+          imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
+        }
+      }
       bool isValidImei = await checkimei(imei ?? '');
       final email = prefs.getString('token');
       bool isValidLogin = await checkIsTokenValid(email ?? '');

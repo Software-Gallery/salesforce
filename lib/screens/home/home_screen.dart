@@ -218,14 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             return heroWidget(ruteProvider);
                           },
                         ),
-                      ),
-                      // ElevatedButton(
-                      //   onPressed: () async {
-                      //     String imei = await FlutterDeviceImei.instance.getIMEI() ?? 'gagal ambil imei';
-                      //     Utils.showActionSnackBar(context: context, text: "Device IMEI/Identifier: $imei", showLoad: false);                      
-                      //   }, 
-                      //   child: Text('Test')
-                      // ),                                  
+                      ),                 
                       SizedBox(height: AppConfig.appSize(context, .01),),
                       padded(
                         Row(
