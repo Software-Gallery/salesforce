@@ -11,7 +11,7 @@ class AppConfig {
 
   static const api_ip = 'https://dspapps.my.id';
   // static const api_ip = 'https://apihappyshop.vys-organizer.com';
-  // static const api_ip = 'http://192.168.8.224';
+  //static const api_ip = 'https://salesforce.software-gallery.com';
   static const api_port = '';
   static String formatNumber(double number) {
     String formattedNumber = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(number);
@@ -22,5 +22,12 @@ class AppConfig {
     final _height = MediaQuery.of(context).size.height;
     final _width = MediaQuery.of(context).size.width;
     return (_width * sizeOfScreen) + (_height * sizeOfScreen);
+  }
+  
+  static String formatDouble(double value) {
+    if (value % 1 == 0) {
+      return value.toInt().toString();
+    }
+    return value.toString();
   }
 }

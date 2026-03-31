@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_launcher_icons/config/config.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -60,7 +61,9 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
 
   bool loadMulai = false;
   bool loadKirim = false;
+  bool loadLokasi = false;
   bool isCartLoad = false;
+  bool isMock = false;
 
   @override
   void initState() {
@@ -251,8 +254,15 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
       Position? location = await getLocation();
 
       if (location == null) {
-        Utils.showActionSnackBar(context: context, text: "Anda sedang menggunakan Mock GPS, Lokasi Anda tidak akurat!", showLoad: true);    
+        Utils.showActionSnackBar(context: context, text: "Anda sedang menggunakan Mock GPS, Lokasi Anda tidak akurat!", showLoad: true);
+        setState(() {
+          isMock = true;
+        });
         return;
+      } else {
+        setState(() {
+          isMock = false;
+        });
       }
 
       setState(() {
@@ -267,19 +277,89 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
   }  
 
   Future<bool> checkPermission() async {
-    final status = await Permission.location.request();
+    var status = await Permission.location.request();
 
     if (status.isDenied) {
       Utils.showActionSnackBar(context: context, text: "Izin Lokasi diperlukan untuk menggunakan fitur ini. ", showLoad: true);
-      return false;
+      status = await Permission.location.request();
+      // return false;
     }
 
     if (status.isPermanentlyDenied) {
       Navigator.of(context).pop();
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(14.0))),
+            title: Text('Izin Lokasi Diperlukan'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      width: AppConfig.appSize(context, .1),
+                      height: AppConfig.appSize(context, .18),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(6), // Ubah sesuai kebutuhan
+                        image: DecorationImage(
+                          image: AssetImage(
+                              'assets/images/lokasi_permission.jpg'), // Ganti dengan gambar Anda
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: AppConfig.appSize(context, .1),
+                      height: AppConfig.appSize(context, .18),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(6), // Ubah sesuai kebutuhan
+                        image: DecorationImage(
+                          image: AssetImage(
+                              'assets/images/lokasi_permission2.jpg'), // Ganti dengan gambar Anda
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(18),
+                      shape: RoundedRectangleBorder(
+                          //to set border radius to button
+                          borderRadius: BorderRadius.circular(16))),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Tutup modal
+                    openAppSettings(); // Buka pengaturan aplikasi
+                  },
+                  child: Row(children: [
+                    Icon(Icons.settings, color: AppColors.accentColor,),
+                    SizedBox(width: 10),
+                    AppText(text: 'Buka Pengaturan', color: AppColors.accentColor,  fontWeight: FontWeight.bold,)
+                  ]),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+      // showDialog(
+      //     context: context,
+      //     builder: (context) =>
+      //         const Center(child: CircularProgressIndicator()));
       return false;
     }
     return true;
-  }
+  }    
 
   Future<String> getAlamatName(Position positionUser) async {
     try {
@@ -549,7 +629,14 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                       children: [
                         TableRow(
                           children: [
-                            SvgPicture.asset("assets/svg/map.svg",width: AppConfig.appSize(context, .03),),              
+                            // SvgPicture.asset("assets/svg/map.svg",width: AppConfig.appSize(context, .03),),       
+                            Container(
+                              width: AppConfig.appSize(context, .03),
+                              height: AppConfig.appSize(context, .03),
+                              child: CircularProgressIndicator(
+                                color: AppColors.accentColor,
+                              ),
+                            ),
                             Text(''),
                             Text(
                             'Lorem Ipsum DolorSit AmetLoIpsum asDolsor SLoremasasdasd Ipsum, Dolor',
@@ -574,15 +661,33 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                     children: [
                       TableRow(
                         children: [
-                          SvgPicture.asset("assets/svg/map.svg",width: AppConfig.appSize(context, .03),),              
+                          GestureDetector(
+                            onTap: widget.isMasuk && ruteProvider.ruteCurrent!.jam_masuk == '' ? () async {
+                              setState(() {
+                                alamatName = '';
+                              });
+                              await Future.delayed(Duration(milliseconds: 500));
+                              await loadAlamat();
+                            } : null,
+                            child: SvgPicture.asset("assets/svg/map.svg",width: AppConfig.appSize(context, .03),),
+                          ),              
                           Text(''),
-                          Text(
-                          widget.isMasuk ? alamatName : ruteProvider.ruteCurrent!.alamat,
-                          style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black,),
+                          GestureDetector(
+                            onTap: widget.isMasuk && ruteProvider.ruteCurrent!.jam_masuk == '' ? () async {
+                              setState(() {
+                                alamatName = '';
+                              });
+                              await Future.delayed(Duration(milliseconds: 500));
+                              await loadAlamat();
+                            } : null, 
+                            child: Text(
+                              widget.isMasuk ? alamatName : ruteProvider.ruteCurrent!.alamat,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,),
+                            ),
                           ),
                         ],
                       ),
@@ -841,7 +946,7 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                                           ) : TextSpan(),
                                           item.disc_perc > 0
                                           ? TextSpan(
-                                            text: " ${item.disc_cash>0 ? '+' : ''} ${item.disc_perc.toInt()}%",
+                                            text: " ${item.disc_cash>0 ? '+' : ''} ${AppConfig.formatDouble(item.disc_perc)}%",
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: AppConfig.appSize(context, .012),
@@ -949,17 +1054,93 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                     SizedBox(width: AppConfig.appSize(context, .01),),
                     
                     Expanded( 
-                      child : Container(
+                      child: IgnorePointer(
+                        ignoring: loadMulai,
                         child: AppButton(
                           isLoad: loadMulai,
                           label: 'Mulai',
                           fontWeight: FontWeight.w600,
                           padding: EdgeInsets.symmetric(vertical: 30),
-                          onPressed: () async {
+                          color: isMock || alamatName == '' ? Colors.grey.shade400 : AppColors.primaryColor,
+                          onPressed: 
+                          isMock || alamatName == ''? null
+                          : () async {
                             try {
                               setState(() {
                                 loadMulai = true;
-                              });
+                              });                              
+                              if (latt == '' || longt == '') {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(14.0))),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          AppText(text: 'Lokasi Tidak Valid', fontSize: 20,fontWeight: FontWeight.bold,),
+                                          AppText(text: 'Pastikan GPS dan Location Permission sudah diaktifkan', fontSize: 16, textAlign: TextAlign.center,),
+                                          SizedBox(height: AppConfig.appSize(context, .01),),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Container(
+                                                width: AppConfig.appSize(context, .1),
+                                                height: AppConfig.appSize(context, .18),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6), // Ubah sesuai kebutuhan
+                                                  image: DecorationImage(
+                                                    image: AssetImage(
+                                                        'assets/images/lokasi_permission.jpg'), // Ganti dengan gambar Anda
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: AppConfig.appSize(context, .1),
+                                                height: AppConfig.appSize(context, .18),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6), // Ubah sesuai kebutuhan
+                                                  image: DecorationImage(
+                                                    image: AssetImage(
+                                                        'assets/images/lokasi_permission2.jpg'), // Ganti dengan gambar Anda
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                padding: const EdgeInsets.all(18),
+                                                shape: RoundedRectangleBorder(
+                                                    //to set border radius to button
+                                                    borderRadius: BorderRadius.circular(16))),
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Tutup modal
+                                              openAppSettings(); // Buka pengaturan aplikasi
+                                            },
+                                            child: Row(children: [
+                                              Icon(Icons.settings, color: AppColors.accentColor,),
+                                              SizedBox(width: 10),
+                                              AppText(text: 'Buka Pengaturan', color: AppColors.accentColor,  fontWeight: FontWeight.bold,)
+                                            ]),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                                setState(() {
+                                  loadMulai = false;
+                                });
+                                return;    
+                              }
                               final prefs = await SharedPreferences.getInstance(); 
                               int kodeSalesOrder = await TrmSalesOrderDetailServices().addHeader(ruteProvider.ruteCurrent!.id_departemen, ruteProvider.ruteCurrent!.id_customer, _keteranganController.text);
                               prefs.setInt('kodesalesorder', kodeSalesOrder);
@@ -993,62 +1174,65 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
                   ],
                 )
                 :
-                Container(
-                  child: AppButton(
-                    isLoad: loadKirim,
-                    label: 'Kirim',
-                    fontWeight: FontWeight.w600,
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    onPressed: () async {
-                      try {
-                        if (barangProvider.totaltambah == 0 && (_keteranganController.text.trim() == '' || _keteranganController.text.isEmpty)) {
-                          Utils.showActionSnackBar(context: context, text: 'Keterangan harus diisi', showLoad: false);
-                          _focusNodeKeterangan.requestFocus();
-                          return;
+                IgnorePointer(
+                  ignoring: loadKirim,
+                  child: Container(
+                    child: AppButton(
+                      isLoad: loadKirim,
+                      label: 'Kirim',
+                      fontWeight: FontWeight.w600,
+                      padding: EdgeInsets.symmetric(vertical: 30),
+                      onPressed: () async {
+                        try {
+                          if (barangProvider.totaltambah == 0 && (_keteranganController.text.trim() == '' || _keteranganController.text.isEmpty)) {
+                            Utils.showActionSnackBar(context: context, text: 'Keterangan harus diisi', showLoad: false);
+                            _focusNodeKeterangan.requestFocus();
+                            return;
+                          }
+                          setState(() {
+                            loadKirim = true;
+                          });
+                          await kirimVisit();
+                          final prefs = await SharedPreferences.getInstance(); 
+                          int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
+                          await RuteServices.selesaiAbsen(kodeSalesOrder,_keteranganController.text);
+                          // await TrmSalesOrderDetailServices().addDetail(kodeSalesOrder);                        
+                          await RuteServices().sendImageToServer(_foto!, kodeSalesOrder.toString());
+                          prefs.setInt('idAbsen', -1);
+                          prefs.setInt('kodesalesorder', 0);
+                          setState(() {
+                            loadKirim = false;
+                          });
+                          // Navigator.pop(context);
+                          Utils.showSuccessSnackBar(context: context, text: "Berhasil menyelesaikan kunjungan", showLoad: false);
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                // Mengatur animasi slide
+                                var begin = Offset(0.0, 1.0);
+                                var end = Offset.zero;
+                                var curve = Curves.easeInOut;
+                  
+                                var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                var slideAnimation = animation.drive(tween);
+                  
+                                return SlideTransition(
+                                  position: slideAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );                        
+                        } catch (e) {
+                          setState(() {
+                            loadKirim = false;
+                          });
+                          Utils.showActionSnackBar(context: context, text: e.toString(), showLoad: false);
                         }
-                        setState(() {
-                          loadKirim = true;
-                        });
-                        await kirimVisit();
-                        final prefs = await SharedPreferences.getInstance(); 
-                        int kodeSalesOrder = prefs.getInt('kodesalesorder') ?? 0;
-                        await RuteServices.selesaiAbsen(kodeSalesOrder,_keteranganController.text);
-                        // await TrmSalesOrderDetailServices().addDetail(kodeSalesOrder);                        
-                        await RuteServices().sendImageToServer(_foto!, kodeSalesOrder.toString());
-                        prefs.setInt('idAbsen', -1);
-                        prefs.setInt('kodesalesorder', 0);
-                        setState(() {
-                          loadKirim = false;
-                        });
-                        // Navigator.pop(context);
-                        Utils.showSuccessSnackBar(context: context, text: "Berhasil menyelesaikan kunjungan", showLoad: false);
-                        Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(),
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              // Mengatur animasi slide
-                              var begin = Offset(0.0, 1.0);
-                              var end = Offset.zero;
-                              var curve = Curves.easeInOut;
-
-                              var tween = Tween<Offset>(begin: begin, end: end).chain(CurveTween(curve: curve));
-                              var slideAnimation = animation.drive(tween);
-
-                              return SlideTransition(
-                                position: slideAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );                        
-                      } catch (e) {
-                        setState(() {
-                          loadKirim = false;
-                        });
-                        Utils.showActionSnackBar(context: context, text: e.toString(), showLoad: false);
-                      }
-                    },
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: AppConfig.appSize(context, .02),),                
@@ -1085,8 +1269,8 @@ class _TambahKunjunganState extends State<TambahKunjungan> {
     } else {
       _budgetApproveController.text = "";
     }
-    _discCashController.text="${barang.disc_cash.round()}";
-    _discPersenController.text="${barang.disc_perc.round()}";
+    _discCashController.text="${AppConfig.formatDouble(barang.disc_cash)}";
+    _discPersenController.text="${AppConfig.formatDouble(barang.disc_perc)}";
     _keteranganController.text="${barang.ket_detail}";
     showModalBottomSheet(
       context: context,

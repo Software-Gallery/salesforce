@@ -32,8 +32,8 @@ class RuteItem {
   final String latlong_customer;
   final String alamat_customer;
   final int jumlah_nota;  
-  final int value_nota;  
-  final int sisa_piutang;  
+  final double value_nota;  
+  final double sisa_piutang;  
   final int jml_absen;  
   final double totalSKU;  
   final double totalValue;  
@@ -80,6 +80,8 @@ class RuteItem {
   factory RuteItem.fromJson(Map<String, dynamic> json) {
     if (json['totalSKU'] is int) json['totalSKU'] = json['totalSKU'].toDouble();    
     if (json['totalValue'] is int) json['totalValue'] = json['totalValue'].toDouble();    
+    if (json['value_nota'] is int) json['value_nota'] = json['value_nota'].toDouble();    
+    if (json['sisa_piutang'] is int) json['sisa_piutang'] = json['sisa_piutang'].toDouble();    
     return RuteItem(
       id_departemen: json['id_departemen'],
       id_customer: json['id_customer'],

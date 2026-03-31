@@ -536,7 +536,7 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
                                           ) : TextSpan(),
                                           item.disc_perc > 0
                                           ? TextSpan(
-                                            text: " ${item.disc_cash>0 ? '+' : ''} ${item.disc_perc.toInt()}%",
+                                            text: " ${item.disc_cash>0 ? '+' : ''} ${AppConfig.formatDouble(item.disc_perc)}%",
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: AppConfig.appSize(context, .012),
@@ -651,8 +651,8 @@ class _ViewKunjunganState extends State<ViewKunjungan> {
     }
     // String recentQty = barangProvider.loadTrnQty(item.id_barang!);
     // _budgetApproveController.text=recentQty;
-    _discCashController.text="${barang.disc_cash.round()}";
-    _discPersenController.text="${barang.disc_perc.round()}";
+    _discCashController.text="${AppConfig.formatDouble(barang.disc_cash)}";
+    _discPersenController.text="${AppConfig.formatDouble(barang.disc_perc)}";
     _keteranganController.text="${barang.ket_detail}";
     showModalBottomSheet(
       context: context,

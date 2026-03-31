@@ -52,8 +52,8 @@ class TrmSalesOrderDetailServices {
         'kode_sales_order': kodesalesorder,
         'id_barang': idBarang,
         'qty': qty,
-        'disc_cash': (disc_cash ?? 0).toInt(),
-        'disc_perc': (disc_perc ?? 0).toInt(),
+        'disc_cash': disc_cash ?? 0,
+        'disc_perc': disc_perc ?? 0,
         'ket': ket,
         'status': status
       };      

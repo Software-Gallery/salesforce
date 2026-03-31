@@ -34,6 +34,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late Future<void> _initializeControllerFuture;
   bool isFrontCamera = true;
   String server = '';
+  bool loadSave = false;
 
   @override
   void dispose() {
@@ -291,41 +292,55 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                         ),
 
                         // Tombol ambil foto
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            shape: CircleBorder(),
-                            padding: EdgeInsets.all(18),
-                            minimumSize: Size(64, 64),
-                          ),
-                          onPressed: () async {
-                            try {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const Center(child: CircularProgressIndicator()),
-                              );
-                              await _initializeControllerFuture;
-                              _controller.setFlashMode(FlashMode.off);
-                              var fixImg;
-                              var image = await _controller.takePicture();
-
-                              fixImg = await fixImgOrientation(File(image.path)) ?? image;
-
-                              File finalImg = await testCompressAndGetFile(fixImg, fixImg.path) ?? fixImg;
-                              
-                              if (!mounted) return;
-                              Navigator.pop(context); // tutup loading
-                              Navigator.pop(context, finalImg.path); // kembali dan kirim path foto
-                            } catch (e) {
-                              print(e);
-                              if (mounted) Navigator.pop(context); // tutup loading kalau error
-                            }
-                          },
-                          child: SvgPicture.asset(
-                            "assets/svg/camera.svg",
-                            color: Colors.white,
-                            width: 32,
-                            height: 32,
+                        IgnorePointer(
+                          ignoring: loadSave,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(18),
+                              minimumSize: Size(64, 64),
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                loadSave = true;
+                              });
+                              try {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  },
+                                );
+                                await _initializeControllerFuture;
+                                _controller.setFlashMode(FlashMode.off);
+                                var fixImg;
+                                var image = await _controller.takePicture();
+                          
+                                fixImg = await fixImgOrientation(File(image.path)) ?? image;
+                          
+                                File finalImg = await testCompressAndGetFile(fixImg, fixImg.path) ?? fixImg;
+                                
+                                if (!mounted) return;
+                                Navigator.pop(context); // tutup loading
+                                Navigator.pop(context, finalImg.path); // kembali dan kirim path foto
+                              } catch (e) {
+                                print(e);
+                                if (mounted) Navigator.pop(context); // tutup loading kalau error
+                              }
+                              setState(() {
+                                loadSave = false;
+                              });
+                            },
+                            child: SvgPicture.asset(
+                              "assets/svg/camera.svg",
+                              color: Colors.white,
+                              width: 32,
+                              height: 32,
+                            ),
                           ),
                         ),
 
