@@ -14,6 +14,7 @@ import 'package:salesforce/provider/RuteProvider.dart';
 import 'package:salesforce/screens/account/auth_page.dart';
 import 'package:salesforce/screens/dashboard/dashboard_screen.dart';
 import 'package:salesforce/screens/tambah_kunjungan.dart';
+import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/services/RuteServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,7 +110,14 @@ class AuthService {
       };
       print("URL: $url");
       print("Request Data: $data");
-      final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
+      final response = await ApiClient.instance.post(
+        url,
+        data: data,
+        options: Options(
+          sendTimeout: const Duration(seconds: 7),
+          receiveTimeout: const Duration(seconds: 7),
+        ),
+      );
       Map<String, dynamic> responseData = response.data;
       return responseData['exist'];      
     } catch (e) {
@@ -131,7 +139,14 @@ class AuthService {
       };
       print("URL: $url");
       print("Request Data: $data");
-      final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
+      final response = await ApiClient.instance.post(
+        url,
+        data: data,
+        options: Options(
+          sendTimeout: const Duration(seconds: 7),
+          receiveTimeout: const Duration(seconds: 7),
+        ),
+      );
       Map<String, dynamic> responseData = response.data;
       return responseData['exist'];      
     } catch (e) {
@@ -164,7 +179,14 @@ class AuthService {
       };
       print("URL: $url");
       print("Request Data: $data");
-      final response = await Dio().post(url, data: data, options: Options (validateStatus: (_) => true));
+      final response = await ApiClient.instance.post(
+        url,
+        data: data,
+        options: Options(
+          sendTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
       if (response.statusCode != 200 || !response.data.containsKey('token')) {
         print('Login failed: ${response.data['message']}');
         throw("${response.data['message']}");
@@ -191,7 +213,13 @@ class AuthService {
           ? url = '$IPConnectShared/api/profile?token=$token'
           : url = '$IPConnectShared:$IPPortShared/api/profile?$token';
       print("URL: $url");
-      final response = await Dio().get(url, options: Options (validateStatus: (_) => true));
+      final response = await ApiClient.instance.get(
+        url,
+        options: Options(
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      );
       if (response.statusCode != 200) {
         print('Login failed: ${response.data['message']}');
         throw("${response.data['message']}");
@@ -223,7 +251,7 @@ class AuthService {
       
       print(url);
 
-      final response = await Dio().get(url);
+      final response = await ApiClient.instance.get(url);
 
       Map<String, dynamic> responseData;
 
@@ -259,7 +287,7 @@ class AuthService {
       
       print(url);
 
-      final response = await Dio().get(url);
+      final response = await ApiClient.instance.get(url);
 
       Map<String, dynamic> responseData;
 
@@ -289,7 +317,7 @@ class AuthService {
       
       print(url);
 
-      final response = await Dio().get(url);
+      final response = await ApiClient.instance.get(url);
 
       Map<String, dynamic> responseData;
 
@@ -314,7 +342,7 @@ class AuthService {
         ? url =  '$IPConnectShared/api/setting-info'
         : url =  '$IPConnectShared:$IPPortShared/api/setting-info';
       print(url);
-      final response = await Dio().get(url);
+      final response = await ApiClient.instance.get(url);
       Map<String, dynamic> responseData;
       responseData = response.data;
       final info = await PackageInfo.fromPlatform();
