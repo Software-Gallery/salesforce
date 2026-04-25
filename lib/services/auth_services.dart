@@ -17,9 +17,11 @@ import 'package:salesforce/screens/tambah_kunjungan.dart';
 import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/services/RuteServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 
 class AuthService {
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   var noVisit = '';
   var namaCustomer = '';
   int loginid = -1;
@@ -83,8 +85,8 @@ class AuthService {
         }
       }
       bool isValidImei = await checkimei(imei ?? '');
-      final email = prefs.getString('token');
-      bool isValidLogin = await checkIsTokenValid(email ?? '');
+      final token = await _secureStorage.read(key: 'token') ?? '';
+      bool isValidLogin = await checkIsTokenValid(token);
       // if (email != null && email != '') {
       //   return true;
       // } else {
@@ -193,7 +195,7 @@ class AuthService {
       }
       Map<String, dynamic> responseData = response.data;
       await getProfile(responseData['token']);
-      prefs.setString('token', responseData['token']); 
+      await _secureStorage.write(key: 'token', value: responseData['token']);
       prefs.setInt('kodesalesorder', 0);
       print("Login success");
       return true;
@@ -211,7 +213,7 @@ class AuthService {
       String url = '';
       IPPortShared.isEmpty
           ? url = '$IPConnectShared/api/profile?token=$token'
-          : url = '$IPConnectShared:$IPPortShared/api/profile?$token';
+          : url = '$IPConnectShared:$IPPortShared/api/profile?token=$token';
       print("URL: $url");
       final response = await ApiClient.instance.get(
         url,

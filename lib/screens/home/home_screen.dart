@@ -22,6 +22,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter_device_imei/flutter_device_imei.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,6 +40,7 @@ enum totalState {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   String cabang = '';
 
@@ -873,7 +875,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (choice == 'logout') {
                             final prefs = await SharedPreferences.getInstance();
                             prefs.setInt('loginid', -1);
-                            prefs.setString('token', '');
+                            await _secureStorage.delete(key: 'token');
                             Navigator.of(context).pushReplacement(new MaterialPageRoute(
                               builder: (BuildContext context) {
                                 return AuthPage();
