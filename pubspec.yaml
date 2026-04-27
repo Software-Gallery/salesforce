@@ -3,7 +3,7 @@ description: Absensi Sales dan Sales Order Maker
 
 publish_to: 'none'
 
-version: 0.0.1+21
+version: 0.0.1+22
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
@@ -47,13 +47,13 @@ dependencies:
   url_launcher: ^6.3.2
   upgrader: ^12.3.0
   flutter_device_imei: ^0.0.4
-  
+  flutter_secure_storage: ^10.0.0
+
   # flutter_localizations: any
   # path: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_secure_storage: ^10.0.0
 
     
 

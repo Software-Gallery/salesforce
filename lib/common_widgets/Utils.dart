@@ -1,87 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:toastification/toastification.dart';
 
 class Utils {
-  static void showActionSnackBar(
-    {
-      required BuildContext context, 
-      required String? text, 
-      IconData? icon, 
-      required bool showLoad,
-    }) {
-    toastification.show(
+  static final GlobalKey<ScaffoldMessengerState> messengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  static void _show({
+    required BuildContext? context,
+    required String? text,
+    required Color color,
+    IconData? icon,
+    bool showLoad = false,
+  }) {
+    void doShow() {
+      final messenger = messengerKey.currentState ??
+          (context != null ? ScaffoldMessenger.maybeOf(context) : null);
+      if (messenger == null) {
+        debugPrint('[Utils] SnackBar gagal tampil (messenger null): $text');
+        return;
+      }
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
+        SnackBar(
+          backgroundColor: color,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          content: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Text(
+                  text ?? '',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => doShow());
+  }
+
+  static void showActionSnackBar({
+    required BuildContext context,
+    required String? text,
+    IconData? icon,
+    required bool showLoad,
+  }) {
+    _show(
       context: context,
-      type: ToastificationType.error,
-      style: ToastificationStyle.flatColored,
-      autoCloseDuration: const Duration(seconds: 3),
-      title: Text(text!),
-      alignment: Alignment.bottomCenter,
-      icon: Icon(icon),
-      showIcon: icon != null,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      borderRadius: BorderRadius.circular(12),
-      showProgressBar: showLoad,
-      closeButtonShowType: CloseButtonShowType.always,
-      dragToClose: true,
-      closeOnClick: false,
-      foregroundColor: Colors.red,
-      primaryColor: Colors.red
+      text: text,
+      icon: icon,
+      showLoad: showLoad,
+      color: Colors.red.shade600,
     );
   }
 
-  static void showSuccessSnackBar(    {
-      required BuildContext context, 
-      required String? text, 
-      IconData? icon, 
-      required bool showLoad,
-    }) {
-     toastification.show(
+  static void showSuccessSnackBar({
+    required BuildContext context,
+    required String? text,
+    IconData? icon,
+    required bool showLoad,
+  }) {
+    _show(
       context: context,
-      type: ToastificationType.success,
-      style: ToastificationStyle.flatColored,
-      autoCloseDuration: const Duration(seconds: 3),
-      title: Text(text!),
-      alignment: Alignment.bottomCenter,
-      icon: Icon(icon),
-      showIcon: icon != null,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      borderRadius: BorderRadius.circular(12),
-      showProgressBar: showLoad,
-      closeButtonShowType: CloseButtonShowType.always,
-      dragToClose: true,
-      closeOnClick: false,
-      foregroundColor: Colors.green,
-      primaryColor: Colors.green
+      text: text,
+      icon: icon,
+      showLoad: showLoad,
+      color: Colors.green.shade600,
     );
   }
 
-  static void showInfoSnackBar(    {
-      required BuildContext context, 
-      required String? text, 
-      IconData? icon, 
-      required bool showLoad,
-    }) {
-     toastification.show(
+  static void showInfoSnackBar({
+    required BuildContext context,
+    required String? text,
+    IconData? icon,
+    required bool showLoad,
+  }) {
+    _show(
       context: context,
-      type: ToastificationType.info,
-      style: ToastificationStyle.flatColored,
-      autoCloseDuration: const Duration(seconds: 3),
-      title: Text(text!),
-      alignment: Alignment.bottomCenter,
-      icon: Icon(icon),
-      showIcon: icon != null,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      borderRadius: BorderRadius.circular(12),
-      showProgressBar: showLoad,
-      closeButtonShowType: CloseButtonShowType.always,
-      dragToClose: true,
-      closeOnClick: false,
-      foregroundColor: Colors.blue,
-      primaryColor: Colors.blue      
+      text: text,
+      icon: icon,
+      showLoad: showLoad,
+      color: Colors.blue.shade600,
     );
   }
 

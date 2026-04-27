@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_device_imei/flutter_device_imei.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +12,7 @@ import 'package:salesforce/l10n/app_localizations.dart';
 import 'package:salesforce/screens/dashboard/dashboard_screen.dart';
 import 'package:salesforce/screens/home/home_screen.dart';
 import 'package:salesforce/services/RuteServices.dart';
+import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -240,26 +242,55 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> onGetStartedClicked(BuildContext context) async {
+    setState(() {
+      isLoad = true;
+    });
     try {
       String imei = '';
-      
+
       if (Platform.isAndroid) {
         imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
       }
       await AuthService().auth(_emailController.text, _passwordController.text, imei);
       final prefs = await SharedPreferences.getInstance();
-      int loginid = prefs.getInt('loginidkaryawan') ?? -1;                
+      int loginid = prefs.getInt('loginidkaryawan') ?? -1;
       String tglaktif = await RuteServices.getTglAktif(loginid);
       await prefs.setString('tglaktif', tglaktif);
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(new MaterialPageRoute(
         builder: (BuildContext context) {
           return DashboardScreen();
         },
       ));
-    } catch (e) {
-       Utils.showActionSnackBar(context: context,showLoad: true,text: e.toString());
+    } on DioException catch (e) {
+      if (!mounted) return;
+      Utils.showActionSnackBar(
+        context: context,
+        showLoad: true,
+        text: describeDioError(e),
+      );
       setState(() {
-        isLoad=false;
+        isLoad = false;
+      });
+    } on SocketException catch (e) {
+      if (!mounted) return;
+      Utils.showActionSnackBar(
+        context: context,
+        showLoad: true,
+        text: describeDioError(e),
+      );
+      setState(() {
+        isLoad = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      Utils.showActionSnackBar(
+        context: context,
+        showLoad: true,
+        text: describeDioError(e),
+      );
+      setState(() {
+        isLoad = false;
       });
     }
   }

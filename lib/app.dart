@@ -10,6 +10,7 @@ import 'package:salesforce/screens/splash_screen.dart';
 import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:salesforce/common_widgets/Utils.dart';
 import 'package:upgrader/upgrader.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -59,6 +60,7 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         title: 'Sales Force',
         theme: themeData,
+        scaffoldMessengerKey: Utils.messengerKey,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: _locale,

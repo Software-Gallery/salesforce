@@ -16,6 +16,7 @@ import 'package:salesforce/provider/TrnSalesOrderHeaderProvider.dart';
 import 'package:salesforce/screens/account/auth_page.dart';
 import 'package:salesforce/screens/pilih_customer_screen.dart';
 import 'package:salesforce/screens/tambah_kunjungan.dart';
+import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -81,14 +82,23 @@ class _HomeScreenState extends State<HomeScreen> {
         await ruteProvider.populateFromApi().then((value) async {
           await Future.delayed(Duration(milliseconds: 500)).then((value) {
             setState(() {
-              isRuteLoad = false; 
+              isRuteLoad = false;
             });
           });
-        });    
+        });
       } catch (e) {
         print(e.toString());
+        if (!mounted) return;
+        setState(() {
+          isRuteLoad = false;
+        });
+        Utils.showActionSnackBar(
+          context: context,
+          showLoad: false,
+          text: describeDioError(e),
+        );
       }
-    }); 
+    });
   }
 
   void showForceUpdateDialog(BuildContext context, {required String message, required String updateUrl}) {
@@ -873,18 +883,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ).then((String? choice) async {
                           if (choice == 'logout') {
-                            final prefs = await SharedPreferences.getInstance();
-                            prefs.setInt('loginid', -1);
-                            await _secureStorage.delete(key: 'token');
+                            await AuthService().signOut();
+                            if (!mounted) return;
                             Navigator.of(context).pushReplacement(new MaterialPageRoute(
                               builder: (BuildContext context) {
                                 return AuthPage();
                               },
-                            ));                                  
+                            ));
                           } else if (choice == 'setting') {
-                            
+
                           }
-                        });                        
+                        });
                       },
                       child: ClipOval(
                         key: menuKey,

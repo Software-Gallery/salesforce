@@ -148,11 +148,11 @@ class RuteServices {
         'kode_sales_order': kode_sales_order,
         
       };
-      var response = await Dio(BaseOptions(connectTimeout: Duration(seconds:15))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
+      var response = await Dio(BaseOptions(connectTimeout: Duration(seconds:10))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
 
       if (!(response.data is Map)) {
         if (response.data.toLowerCase().contains('html')) {
-          response = await Dio(BaseOptions(connectTimeout: Duration(seconds: 10))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
+          response = await Dio(BaseOptions(connectTimeout: Duration(seconds: 6))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
         }
       }
 
@@ -188,7 +188,7 @@ class RuteServices {
 
       if (!(response.data is Map)) {
         if (response.data.toLowerCase().contains('html')) {
-          response = await Dio(BaseOptions(connectTimeout: Duration(seconds: 10))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
+          response = await Dio(BaseOptions(connectTimeout: Duration(seconds: 6))).post(url, data: data, options: Options (validateStatus: (_) => true, responseType: ResponseType.json,));
         }
       }      
 

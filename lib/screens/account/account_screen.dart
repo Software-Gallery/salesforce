@@ -9,6 +9,7 @@ import 'package:salesforce/l10n/app_localizations.dart';
 import 'package:salesforce/provider/setting_provider.dart';
 import 'package:salesforce/screens/about_screen.dart';
 import 'package:salesforce/screens/account/auth_page.dart';
+import 'package:salesforce/services/auth_services.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -268,10 +269,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
         ),
         onPressed: () async {
-          final prefs = await SharedPreferences.getInstance();
-          prefs.setString('email', '');
-          prefs.setString('username', '');
-          prefs.setInt('loginid', -1);
+          await AuthService().signOut();
+          if (!mounted) return;
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage(),));
         },
       ),

@@ -13,6 +13,7 @@ import 'package:salesforce/models/rute_item.dart';
 import 'package:salesforce/models/trn_sales_order_header.dart';
 import 'package:salesforce/provider/RuteProvider.dart';
 import 'package:salesforce/screens/view_kunjungan.dart';
+import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -48,17 +49,18 @@ class _HistoriScreenState extends State<HistoriScreen> {
               isTrnLoad = false;
             });
           });
-        });     
-        // final trnHeaderProvider = Provider.of<TrmSalesOrderHeaderProvider>(context, listen: false);
-        // await trnHeaderProvider.populateFromApi().then((value) async {
-        //   await Future.delayed(Duration(milliseconds: 500)).then((value) {
-        //     setState(() {
-        //       isTrnLoad = false; 
-        //     });
-        //   });
-        // });     
+        });
       } catch (e) {
         print(e.toString());
+        if (!mounted) return;
+        setState(() {
+          isTrnLoad = false;
+        });
+        Utils.showActionSnackBar(
+          context: context,
+          showLoad: false,
+          text: describeDioError(e),
+        );
       }
     });
   }

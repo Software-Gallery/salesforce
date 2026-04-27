@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:salesforce/common_widgets/Utils.dart';
+import 'package:salesforce/common_widgets/app_button.dart';
 import 'package:salesforce/config.dart';
 import 'package:salesforce/models/rute_item.dart';
 import 'package:salesforce/provider/RuteProvider.dart';
@@ -26,34 +27,9 @@ class AuthService {
   var namaCustomer = '';
   int loginid = -1;
   RuteItem ruteCurrent = RuteItem(id_departemen: -1, id_customer: -1, id_karyawan: -1, day1: -1, day2: -1, day3: -1, day4: -1, day5: -1, day6: -1, day7: -1, week_ganjil: -1, week_genap: -1, nama_customer: 'null', nama_departemen: 'null', kode_sales_order: '', tgl: '', jam_masuk: '', jam_keluar: '', latitude: 0.00, longitude: 0.00, keterangan: '', alamat: '', id_absen: -1, week: -1, tgl_aktif: DateTime.now(), tipe: '', status: '', kode_customer: '', latlong_customer: '', alamat_customer: '', jumlah_nota: 0, value_nota: 0, sisa_piutang: 0, jml_absen: 0, totalSKU: 0, totalValue: 0);
-  handleAuthState() {
+  Widget handleAuthState() {
     setCabangPrefs();
-    return FutureBuilder(
-        future: checkLoginSession(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          } else if (snapshot.hasError) {
-            return const Scaffold(body: Center(child: Text('Something went wrong!')));
-          } else if (snapshot.data == true) {
-            return FutureBuilder<bool>(
-              future: getCurrentNoVisit(context),
-              builder: (context, noVisitSnapshot) {
-                if (noVisitSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Scaffold(body: Center(child: CircularProgressIndicator()));
-                } else if (noVisitSnapshot.hasError) {
-                  return const Scaffold(body: Center(child: Text('Error checking visit status')));
-                } else if (noVisitSnapshot.data == true) {
-                  return TambahKunjungan(jam: DateFormat('HH:mm:ss').format(DateTime.now()), isMasuk: false,);
-                } else {
-                  return DashboardScreen();
-                }
-              },
-            );
-          } else {
-            return AuthPage();
-          }
-        });
+    return const _AuthStateGate();
   }
 
   Future<bool> getCurrentNoVisit(BuildContext context) async {
@@ -77,26 +53,42 @@ class AuthService {
 
   Future<bool> checkLoginSession() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       String imei = '';
       if (!kIsWeb) {
         if (Platform.isAndroid) {
           imei = await FlutterDeviceImei.instance.getIMEI() ?? '';
         }
       }
-      bool isValidImei = await checkimei(imei ?? '');
+      bool isValidImei = await checkimei(imei);
       final token = await _secureStorage.read(key: 'token') ?? '';
+      if (token.isEmpty) {
+        return false;
+      }
       bool isValidLogin = await checkIsTokenValid(token);
-      // if (email != null && email != '') {
-      //   return true;
-      // } else {
-      //   return false;
-      // }      
-      return isValidLogin && isValidImei;
+      final ok = isValidLogin && isValidImei;
+      if (!ok) {
+        await signOut();
+      }
+      return ok;
     } catch (e) {
       print(e);
       throw(e);
     }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await _secureStorage.delete(key: 'token');
+    } catch (_) {}
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('loginid');
+    await prefs.remove('loginidkaryawan');
+    await prefs.remove('loginname');
+    await prefs.remove('loginemail');
+    await prefs.remove('tglaktif');
+    await prefs.remove('kodesalesorder');
+    await prefs.remove('email');
+    await prefs.remove('username');
   }
 
   Future<bool> checkimei(String imei) async {
@@ -120,11 +112,16 @@ class AuthService {
           receiveTimeout: const Duration(seconds: 7),
         ),
       );
-      Map<String, dynamic> responseData = response.data;
-      return responseData['exist'];      
+      if (response.statusCode != 200) {
+        throw('${response.data is Map ? response.data['message'] ?? 'Gagal validasi IMEI' : 'Gagal validasi IMEI'}');
+      }
+      if (response.data is! Map) {
+        return false;
+      }
+      return response.data['exist'] == true;
     } catch (e) {
       print('Error: $e');
-      throw e;      
+      throw describeDioError(e);
     }
   }
 
@@ -149,11 +146,19 @@ class AuthService {
           receiveTimeout: const Duration(seconds: 7),
         ),
       );
-      Map<String, dynamic> responseData = response.data;
-      return responseData['exist'];      
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        return false;
+      }
+      if (response.statusCode != 200) {
+        throw('${response.data is Map ? response.data['message'] ?? 'Sesi tidak valid' : 'Sesi tidak valid'}');
+      }
+      if (response.data is! Map) {
+        return false;
+      }
+      return response.data['exist'] == true;
     } catch (e) {
       print('Error: $e');
-      throw e;      
+      throw describeDioError(e);
     }
   }
 
@@ -189,9 +194,14 @@ class AuthService {
           receiveTimeout: const Duration(seconds: 15),
         ),
       );
-      if (response.statusCode != 200 || !response.data.containsKey('token')) {
-        print('Login failed: ${response.data['message']}');
-        throw("${response.data['message']}");
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        final msg = response.data is Map ? (response.data['message'] ?? 'Email atau password salah') : 'Email atau password salah';
+        throw('$msg');
+      }
+      if (response.statusCode != 200 || response.data is! Map || !(response.data as Map).containsKey('token')) {
+        final msg = response.data is Map ? (response.data['message'] ?? 'Login gagal') : 'Login gagal';
+        print('Login failed: $msg');
+        throw('$msg');
       }
       Map<String, dynamic> responseData = response.data;
       await getProfile(responseData['token']);
@@ -201,7 +211,7 @@ class AuthService {
       return true;
     } catch (e) {
       print('Error: $e');
-      throw e;
+      throw describeDioError(e);
     }
   }
 
@@ -218,24 +228,25 @@ class AuthService {
       final response = await ApiClient.instance.get(
         url,
         options: Options(
-          sendTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 7),
+          receiveTimeout: const Duration(seconds: 7),
         ),
       );
       if (response.statusCode != 200) {
-        print('Login failed: ${response.data['message']}');
-        throw("${response.data['message']}");
+        final msg = response.data is Map ? (response.data['message'] ?? 'Gagal mengambil profil') : 'Gagal mengambil profil';
+        print('Login failed: $msg');
+        throw('$msg');
       }
       Map<String, dynamic> responseData = response.data;
       print("Login success");
-      prefs.setInt('loginid', responseData['data']['id']); 
-      prefs.setInt('loginidkaryawan', responseData['data']['id_karyawan']); 
-      prefs.setString('loginname', responseData['data']['name']); 
-      prefs.setString('loginemail', responseData['data']['email']); 
+      prefs.setInt('loginid', responseData['data']['id']);
+      prefs.setInt('loginidkaryawan', responseData['data']['id_karyawan']);
+      prefs.setString('loginname', responseData['data']['name']);
+      prefs.setString('loginemail', responseData['data']['email']);
       return true;
     } catch (e) {
       print('Error: $e');
-      throw e;
+      throw describeDioError(e);
     }
   }
 
@@ -380,4 +391,134 @@ class AuthService {
 
 
 
+}
+
+class _AuthStateGate extends StatefulWidget {
+  const _AuthStateGate({Key? key}) : super(key: key);
+
+  @override
+  State<_AuthStateGate> createState() => _AuthStateGateState();
+}
+
+class _AuthStateGateState extends State<_AuthStateGate> {
+  late Future<bool> _sessionFuture;
+  Future<bool>? _visitFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionFuture = _runCheckSession();
+  }
+
+  Future<bool> _runCheckSession() {
+    return AuthService().checkLoginSession().timeout(
+      const Duration(seconds: 7),
+      onTimeout: () => throw 'Koneksi sedang bermasalah, periksa koneksi internet Anda.',
+    );
+  }
+
+  Future<bool> _runCheckVisit() {
+    return AuthService().getCurrentNoVisit(context).timeout(
+      const Duration(seconds: 7),
+      onTimeout: () => throw 'Koneksi sedang bermasalah, periksa koneksi internet Anda.',
+    );
+  }
+
+  void _retry() {
+    setState(() {
+      _visitFuture = null;
+      _sessionFuture = _runCheckSession();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _sessionFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (snapshot.hasError) {
+          return NoInternetScreen(
+            message: snapshot.error.toString(),
+            onRetry: _retry,
+          );
+        }
+        if (snapshot.data == true) {
+          _visitFuture ??= _runCheckVisit();
+          return FutureBuilder<bool>(
+            future: _visitFuture,
+            builder: (context, visitSnap) {
+              if (visitSnap.connectionState == ConnectionState.waiting) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+              if (visitSnap.hasError) {
+                return NoInternetScreen(
+                  message: visitSnap.error.toString(),
+                  onRetry: _retry,
+                );
+              }
+              if (visitSnap.data == true) {
+                return TambahKunjungan(
+                  jam: DateFormat('HH:mm:ss').format(DateTime.now()),
+                  isMasuk: false,
+                );
+              }
+              return DashboardScreen();
+            },
+          );
+        }
+        return AuthPage();
+      },
+    );
+  }
+}
+
+class NoInternetScreen extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const NoInternetScreen({
+    Key? key,
+    required this.onRetry,
+    this.message = 'Tidak ada koneksi internet.',
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.wifi_off_rounded, size: 96, color: Colors.grey),
+                const SizedBox(height: 24),
+                const Text(
+                  'Tidak Ada Koneksi Internet',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                AppButton(
+                  label: 'Refresh',
+                  onPressed: onRetry,
+                  trailingWidget: const Icon(Icons.refresh, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

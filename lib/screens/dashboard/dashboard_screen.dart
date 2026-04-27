@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:salesforce/common_widgets/Utils.dart';
 import 'package:salesforce/config.dart';
 import 'package:salesforce/l10n/app_localizations.dart';
 import 'package:salesforce/provider/BarangProvider.dart';
 import 'package:salesforce/services/RuteServices.dart';
+import 'package:salesforce/services/api_client.dart';
 import 'package:salesforce/styles/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,14 +27,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final prefs = await SharedPreferences.getInstance();
-        int loginid = prefs.getInt('loginidkaryawan') ?? -1;          
+        int loginid = prefs.getInt('loginidkaryawan') ?? -1;
         String tglaktif = await RuteServices.getTglAktif(loginid);
-        prefs.setString('tglaktif', tglaktif);        
-        // final barangProvider = Provider.of<BarangProvider>(context, listen: false);
-        // barangProvider.belanjaPopulateFromApi(); 
-        // barangProvider.produkCartPopulateFromApi(); 
+        prefs.setString('tglaktif', tglaktif);
       } catch (e) {
         print(e.toString());
+        if (!mounted) return;
+        Utils.showActionSnackBar(
+          context: context,
+          showLoad: false,
+          text: describeDioError(e),
+        );
       }
     });
   }
