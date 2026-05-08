@@ -322,7 +322,7 @@ class _PilihCustomerScreenState extends State<PilihCustomerScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    e.id_customer.toString(),
+                    e.kode_customer,
                     style: const TextStyle(
                       color: AppColors.darkGrey,
                       fontSize: 12,
